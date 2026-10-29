@@ -39,7 +39,7 @@ Support
 
 Kambeu Henang Ange Duval — duvalkambeu61@gmail.com
 """,
-    'author': "ADK — Kambeu Henang Ange Duval",
+    'author': "Kambeu Henang Ange Duval",
     'maintainer': "Kambeu Henang Ange Duval",
     'support': 'duvalkambeu61@gmail.com',
     'website': "",
