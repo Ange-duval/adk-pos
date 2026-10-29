@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="categ_restaurant" model="product.category">
+            <field name="name">Restaurant</field>
+            <field name="parent_id" ref="product.product_category_all"/>
+        </record>
+        <record id="categ_restaurant_entrees" model="product.category">
+            <field name="name">Entrées</field>
+            <field name="parent_id" ref="categ_restaurant"/>
+        </record>
+        <record id="categ_restaurant_plats" model="product.category">
+            <field name="name">Plats</field>
+            <field name="parent_id" ref="categ_restaurant"/>
+        </record>
+        <record id="categ_restaurant_grillades" model="product.category">
+            <field name="name">Grillades &amp; poissons</field>
+            <field name="parent_id" ref="categ_restaurant"/>
+        </record>
+        <record id="categ_restaurant_desserts" model="product.category">
+            <field name="name">Desserts</field>
+            <field name="parent_id" ref="categ_restaurant"/>
+        </record>
+        <record id="categ_restaurant_fraiches" model="product.category">
+            <field name="name">Boissons fraîches</field>
+            <field name="parent_id" ref="categ_restaurant"/>
+        </record>
+        <record id="categ_restaurant_chaudes" model="product.category">
+            <field name="name">Boissons chaudes</field>
+            <field name="parent_id" ref="categ_restaurant"/>
+        </record>
+        <record id="categ_restaurant_bieres" model="product.category">
+            <field name="name">Bières &amp; vins</field>
+            <field name="parent_id" ref="categ_restaurant"/>
+        </record>
+        <record id="categ_cafe" model="product.category">
+            <field name="name">Café</field>
+            <field name="parent_id" ref="product.product_category_all"/>
+        </record>
+        <record id="categ_cafe_cafes" model="product.category">
+            <field name="name">Cafés</field>
+            <field name="parent_id" ref="categ_cafe"/>
+        </record>
+        <record id="categ_cafe_thes" model="product.category">
+            <field name="name">Thés &amp; infusions</field>
+            <field name="parent_id" ref="categ_cafe"/>
+        </record>
+        <record id="categ_cafe_fraiches" model="product.category">
+            <field name="name">Boissons fraîches</field>
+            <field name="parent_id" ref="categ_cafe"/>
+        </record>
+        <record id="categ_cafe_viennoiseries" model="product.category">
+            <field name="name">Viennoiseries</field>
+            <field name="parent_id" ref="categ_cafe"/>
+        </record>
+        <record id="categ_cafe_gateaux" model="product.category">
+            <field name="name">Gâteaux</field>
+            <field name="parent_id" ref="categ_cafe"/>
+        </record>
+        <record id="categ_cafe_sale" model="product.category">
+            <field name="name">Salé</field>
+            <field name="parent_id" ref="categ_cafe"/>
+        </record>
+        <record id="categ_bar" model="product.category">
+            <field name="name">Bar</field>
+            <field name="parent_id" ref="product.product_category_all"/>
+        </record>
+        <record id="categ_bar_cocktails" model="product.category">
+            <field name="name">Cocktails</field>
+            <field name="parent_id" ref="categ_bar"/>
+        </record>
+        <record id="categ_bar_bieres" model="product.category">
+            <field name="name">Bières</field>
+            <field name="parent_id" ref="categ_bar"/>
+        </record>
+        <record id="categ_bar_vins" model="product.category">
+            <field name="name">Vins &amp; spiritueux</field>
+            <field name="parent_id" ref="categ_bar"/>
+        </record>
+        <record id="categ_bar_softs" model="product.category">
+            <field name="name">Softs</field>
+            <field name="parent_id" ref="categ_bar"/>
+        </record>
+        <record id="categ_bar_snacks" model="product.category">
+            <field name="name">Snacks</field>
+            <field name="parent_id" ref="categ_bar"/>
+        </record>
+        <record id="categ_fastfood" model="product.category">
+            <field name="name">Fast-food</field>
+            <field name="parent_id" ref="product.product_category_all"/>
+        </record>
+        <record id="categ_fastfood_burgers" model="product.category">
+            <field name="name">Burgers</field>
+            <field name="parent_id" ref="categ_fastfood"/>
+        </record>
+        <record id="categ_fastfood_wraps" model="product.category">
+            <field name="name">Sandwichs &amp; wraps</field>
+            <field name="parent_id" ref="categ_fastfood"/>
+        </record>
+        <record id="categ_fastfood_accomp" model="product.category">
+            <field name="name">Accompagnements</field>
+            <field name="parent_id" ref="categ_fastfood"/>
+        </record>
+        <record id="categ_fastfood_desserts" model="product.category">
+            <field name="name">Desserts</field>
+            <field name="parent_id" ref="categ_fastfood"/>
+        </record>
+        <record id="categ_fastfood_boissons" model="product.category">
+            <field name="name">Boissons</field>
+            <field name="parent_id" ref="categ_fastfood"/>
+        </record>
+        <record id="categ_retail" model="product.category">
+            <field name="name">Commerce de détail</field>
+            <field name="parent_id" ref="product.product_category_all"/>
+        </record>
+        <record id="categ_retail_epicerie" model="product.category">
+            <field name="name">Épicerie</field>
+            <field name="parent_id" ref="categ_retail"/>
+        </record>
+        <record id="categ_retail_boissons" model="product.category">
+            <field name="name">Boissons</field>
+            <field name="parent_id" ref="categ_retail"/>
+        </record>
+        <record id="categ_retail_fruits" model="product.category">
+            <field name="name">Fruits &amp; légumes</field>
+            <field name="parent_id" ref="categ_retail"/>
+        </record>
+        <record id="categ_retail_hygiene" model="product.category">
+            <field name="name">Hygiène</field>
+            <field name="parent_id" ref="categ_retail"/>
+        </record>
+        <record id="categ_retail_maison" model="product.category">
+            <field name="name">Maison</field>
+            <field name="parent_id" ref="categ_retail"/>
+        </record>
+        <record id="categ_boutique" model="product.category">
+            <field name="name">Boutique</field>
+            <field name="parent_id" ref="product.product_category_all"/>
+        </record>
+        <record id="categ_boutique_homme" model="product.category">
+            <field name="name">Vêtements Homme</field>
+            <field name="parent_id" ref="categ_boutique"/>
+        </record>
+        <record id="categ_boutique_femme" model="product.category">
+            <field name="name">Vêtements Femme</field>
+            <field name="parent_id" ref="categ_boutique"/>
+        </record>
+        <record id="categ_boutique_chaussures" model="product.category">
+            <field name="name">Chaussures</field>
+            <field name="parent_id" ref="categ_boutique"/>
+        </record>
+        <record id="categ_boutique_accessoires" model="product.category">
+            <field name="name">Accessoires</field>
+            <field name="parent_id" ref="categ_boutique"/>
+        </record>
+    </data>
+</odoo>

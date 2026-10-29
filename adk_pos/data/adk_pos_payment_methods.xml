@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="partner_walkin" model="res.partner">
+            <field name="name">Client divers (Point de Vente)</field>
+            <field name="is_company">False</field>
+            <field name="customer_rank">0</field>
+            <field name="comment">Client utilisé automatiquement quand aucun client n'est renseigné sur une commande ADK Point de Vente.</field>
+        </record>
+
+        <record id="payment_method_cash" model="adk.pos.payment.method">
+            <field name="name">Espèces</field>
+            <field name="sequence">1</field>
+            <field name="icon">money</field>
+            <field name="is_cash">True</field>
+            <field name="requires_reference">False</field>
+        </record>
+
+        <record id="payment_method_card" model="adk.pos.payment.method">
+            <field name="name">Carte bancaire</field>
+            <field name="sequence">2</field>
+            <field name="icon">credit-card</field>
+            <field name="is_cash">False</field>
+            <field name="requires_reference">True</field>
+        </record>
+
+        <record id="payment_method_mobile" model="adk.pos.payment.method">
+            <field name="name">Mobile Money</field>
+            <field name="sequence">3</field>
+            <field name="icon">mobile</field>
+            <field name="is_cash">False</field>
+            <field name="requires_reference">True</field>
+        </record>
+
+        <record id="payment_method_credit" model="adk.pos.payment.method">
+            <field name="name">À crédit</field>
+            <field name="sequence">5</field>
+            <field name="icon">bank</field>
+            <field name="is_cash">False</field>
+            <field name="is_credit">True</field>
+            <field name="requires_reference">False</field>
+        </record>
+
+        <record id="payment_method_other" model="adk.pos.payment.method">
+            <field name="name">Autre</field>
+            <field name="sequence">4</field>
+            <field name="icon">ellipsis-h</field>
+            <field name="is_cash">False</field>
+            <field name="requires_reference">False</field>
+        </record>
+
+    </data>
+</odoo>

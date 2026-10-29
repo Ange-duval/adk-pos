@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_adk_pos_setup_wizard_form" model="ir.ui.view">
+        <field name="name">adk.pos.setup.wizard.form</field>
+        <field name="model">adk.pos.setup.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Créer mon premier point de vente">
+                <div class="alert alert-info" role="alert">
+                    Quelques informations suffisent : le point de vente est prêt à l'emploi, vous pourrez tout modifier
+                    ensuite dans <b>Paramètres</b>.
+                </div>
+                <group>
+                    <group string="Votre activité">
+                        <field name="name" placeholder="Ex : Restaurant Le Bon Goût"/>
+                        <field name="pos_type"/>
+                        <field name="uses_tables" invisible="1"/>
+                        <field name="table_count" invisible="not uses_tables"/>
+                        <field name="seats" invisible="not uses_tables"/>
+                        <field name="use_sample_plan" invisible="not uses_tables"/>
+                    </group>
+                    <group string="Votre accès caisse">
+                        <field name="pin" password="True"/>
+                        <field name="pin_confirm" password="True"/>
+                        <field name="create_stations" widget="boolean_toggle" invisible="not uses_tables"/>
+                        <field name="create_notes" widget="boolean_toggle"/>
+                    </group>
+                </group>
+                <footer>
+                    <button string="Créer et ouvrir le terminal" name="action_confirm" type="object" class="btn-primary"/>
+                    <button string="Annuler" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_adk_pos_setup_wizard" model="ir.actions.act_window">
+        <field name="name">Créer mon premier point de vente</field>
+        <field name="res_model">adk.pos.setup.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

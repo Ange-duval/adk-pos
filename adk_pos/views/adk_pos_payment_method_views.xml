@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_adk_pos_payment_method_list" model="ir.ui.view">
+        <field name="name">adk.pos.payment.method.list</field>
+        <field name="model">adk.pos.payment.method</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="icon"/>
+                <field name="is_cash"/>
+                <field name="requires_reference"/>
+                <field name="is_credit"/>
+                <field name="journal_id" optional="show"/>
+                <field name="active" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_adk_pos_payment_method_form" model="ir.ui.view">
+        <field name="name">adk.pos.payment.method.form</field>
+        <field name="model">adk.pos.payment.method</field>
+        <field name="arch" type="xml">
+            <form string="Mode de paiement">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="icon"/>
+                        <field name="is_cash"/>
+                        <field name="requires_reference"/>
+                        <field name="is_credit"/>
+                        <field name="journal_id"/>
+                        <field name="active"/>
+                    </group>
+                    <group string="Connexion à un terminal de paiement (TPE, Mobile Money, passerelle)">
+                        <field name="terminal_type"/>
+                    </group>
+                    <group invisible="terminal_type != 'http'">
+                        <group string="Requête">
+                            <field name="terminal_url" placeholder="http://192.168.1.50:8080/api/pay"/>
+                            <field name="terminal_method"/>
+                            <field name="terminal_timeout"/>
+                            <field name="terminal_headers"/>
+                            <field name="terminal_body"/>
+                        </group>
+                        <group string="Réponse attendue">
+                            <field name="terminal_ok_path"/>
+                            <field name="terminal_ok_values"/>
+                            <field name="terminal_ref_path"/>
+                        </group>
+                    </group>
+                    <p class="text-muted" invisible="terminal_type != 'http'">
+                        Au moment de payer, le terminal de caisse affiche le bouton « Envoyer au terminal » :
+                        le montant est transmis à l'adresse ci-dessus et, si la réponse indique un succès,
+                        la référence de transaction est enregistrée automatiquement. Fonctionne avec tout
+                        appareil ou service qui expose une API HTTP / JSON.
+                    </p>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_adk_pos_payment_method" model="ir.actions.act_window">
+        <field name="name">Modes de paiement</field>
+        <field name="res_model">adk.pos.payment.method</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

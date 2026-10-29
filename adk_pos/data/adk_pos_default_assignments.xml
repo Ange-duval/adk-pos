@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Restaurant + Café partagent les plats/boissons -->
+        <record id="product_ndole" model="product.template">
+            <field name="adk_pos_config_ids" eval="[(6, 0, [ref('config_restaurant')])]"/>
+        </record>
+        <record id="product_poulet_dg" model="product.template">
+            <field name="adk_pos_config_ids" eval="[(6, 0, [ref('config_restaurant')])]"/>
+        </record>
+        <record id="product_eru" model="product.template">
+            <field name="adk_pos_config_ids" eval="[(6, 0, [ref('config_restaurant')])]"/>
+        </record>
+        <record id="product_riz_sauce" model="product.template">
+            <field name="adk_pos_config_ids" eval="[(6, 0, [ref('config_restaurant')])]"/>
+        </record>
+        <record id="product_brochettes" model="product.template">
+            <field name="adk_pos_config_ids" eval="[(6, 0, [ref('config_restaurant')])]"/>
+        </record>
+
+        <record id="product_jus_bissap" model="product.template">
+            <field name="adk_pos_config_ids" eval="[(6, 0, [ref('config_restaurant'), ref('config_cafe')])]"/>
+        </record>
+        <record id="product_jus_gingembre" model="product.template">
+            <field name="adk_pos_config_ids" eval="[(6, 0, [ref('config_restaurant'), ref('config_cafe')])]"/>
+        </record>
+        <record id="product_eau_minerale" model="product.template">
+            <field name="adk_pos_config_ids" eval="[(6, 0, [ref('config_restaurant'), ref('config_cafe')])]"/>
+        </record>
+        <record id="product_coca" model="product.template">
+            <field name="adk_pos_config_ids" eval="[(6, 0, [ref('config_restaurant'), ref('config_cafe')])]"/>
+        </record>
+        <record id="product_biere" model="product.template">
+            <field name="adk_pos_config_ids" eval="[(6, 0, [ref('config_restaurant')])]"/>
+        </record>
+        <record id="product_cafe" model="product.template">
+            <field name="adk_pos_config_ids" eval="[(6, 0, [ref('config_cafe')])]"/>
+        </record>
+        <record id="product_beignets" model="product.template">
+            <field name="adk_pos_config_ids" eval="[(6, 0, [ref('config_cafe')])]"/>
+        </record>
+        <record id="product_croissant" model="product.template">
+            <field name="adk_pos_config_ids" eval="[(6, 0, [ref('config_cafe')])]"/>
+        </record>
+
+        <!-- Boutique -->
+        <record id="product_tshirt_homme" model="product.template">
+            <field name="adk_pos_config_ids" eval="[(6, 0, [ref('config_boutique')])]"/>
+        </record>
+        <record id="product_jean_homme" model="product.template">
+            <field name="adk_pos_config_ids" eval="[(6, 0, [ref('config_boutique')])]"/>
+        </record>
+        <record id="product_chemise_homme" model="product.template">
+            <field name="adk_pos_config_ids" eval="[(6, 0, [ref('config_boutique')])]"/>
+        </record>
+        <record id="product_robe_femme" model="product.template">
+            <field name="adk_pos_config_ids" eval="[(6, 0, [ref('config_boutique')])]"/>
+        </record>
+        <record id="product_jupe_femme" model="product.template">
+            <field name="adk_pos_config_ids" eval="[(6, 0, [ref('config_boutique')])]"/>
+        </record>
+        <record id="product_sac_femme" model="product.template">
+            <field name="adk_pos_config_ids" eval="[(6, 0, [ref('config_boutique')])]"/>
+        </record>
+        <record id="product_baskets" model="product.template">
+            <field name="adk_pos_config_ids" eval="[(6, 0, [ref('config_boutique')])]"/>
+        </record>
+        <record id="product_sandales" model="product.template">
+            <field name="adk_pos_config_ids" eval="[(6, 0, [ref('config_boutique')])]"/>
+        </record>
+        <record id="product_chaussures_ville" model="product.template">
+            <field name="adk_pos_config_ids" eval="[(6, 0, [ref('config_boutique')])]"/>
+        </record>
+
+    </data>
+</odoo>

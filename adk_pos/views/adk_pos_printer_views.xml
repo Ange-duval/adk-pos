@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_adk_pos_printer_list" model="ir.ui.view">
+        <field name="name">adk.pos.printer.list</field>
+        <field name="model">adk.pos.printer</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="connection"/>
+                <field name="ip_address" optional="show"/>
+                <field name="paper_width"/>
+                <field name="use_receipt" widget="boolean_toggle"/>
+                <field name="use_kitchen" widget="boolean_toggle"/>
+                <field name="active" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_adk_pos_printer_form" model="ir.ui.view">
+        <field name="name">adk.pos.printer.form</field>
+        <field name="model">adk.pos.printer</field>
+        <field name="arch" type="xml">
+            <form string="Imprimante">
+                <header>
+                    <button name="action_test_print" type="object" string="Imprimer une page de test" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><label for="name"/><h1><field name="name" placeholder="Ex : Caisse, Cuisine, Bar"/></h1></div>
+                    <group>
+                        <group string="Connexion">
+                            <field name="connection" widget="radio"/>
+                            <field name="ip_address" invisible="connection != 'network'" placeholder="192.168.1.50"/>
+                            <field name="port" invisible="connection != 'network'" options="{'format': false}"/>
+                            <field name="bridge_url" invisible="connection != 'bridge'"/>
+                            <field name="bridge_printer_name" invisible="connection != 'bridge'"/>
+                        </group>
+                        <group string="Papier &amp; caractères">
+                            <field name="paper_width"/>
+                            <field name="serial_baud" invisible="connection != 'webserial'"/>
+                            <field name="codepage" invisible="connection == 'browser'"/>
+                            <field name="cut_paper" widget="boolean_toggle" invisible="connection == 'browser'"/>
+                            <field name="open_drawer" widget="boolean_toggle" invisible="connection == 'browser'"/>
+                            <field name="copies"/>
+                        </group>
+                    </group>
+                    <group string="Que doit imprimer cette imprimante ?">
+                        <group>
+                            <field name="use_receipt" widget="boolean_toggle"/>
+                            <field name="use_bill" widget="boolean_toggle"/>
+                            <field name="use_report" widget="boolean_toggle"/>
+                        </group>
+                        <group>
+                            <field name="use_kitchen" widget="boolean_toggle"/>
+                            <field name="station_ids" widget="many2many_tags" invisible="not use_kitchen"
+                                   options="{'color_field': 'color'}"/>
+                            <field name="config_ids" widget="many2many_tags"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-info" role="alert" invisible="connection != 'browser'">
+                        <b>Mode navigateur</b> : fonctionne avec n'importe quelle imprimante installée sur l'ordinateur
+                        ou la tablette (USB, Wi-Fi, Bluetooth, PDF). Pour imprimer sans fenêtre de confirmation,
+                        lancez Chrome avec l'option <code>--kiosk-printing</code>.
+                    </div>
+                    <div class="alert alert-info" role="alert" invisible="connection != 'network'">
+                        <b>Réseau</b> : imprimantes de tickets Ethernet / Wi-Fi (Epson, Star, Xprinter, Rongta, Sunmi…).
+                        Le serveur Odoo doit atteindre l'imprimante (même réseau, ou VPN). Port habituel : 9100.
+                    </div>
+                    <div class="alert alert-info" role="alert" invisible="connection != 'webusb'">
+                        <b>USB direct</b> : navigateur Chrome ou Edge. Au premier test, le navigateur demande
+                        d'autoriser l'imprimante ; l'autorisation est ensuite mémorisée.
+                    </div>
+                    <div class="alert alert-info" role="alert" invisible="connection != 'webserial'">
+                        <b>Série / Bluetooth</b> : navigateur Chrome ou Edge. Associez d'abord l'imprimante Bluetooth au
+                        système, puis choisissez-la au premier test.
+                    </div>
+                    <div class="alert alert-info" role="alert" invisible="connection != 'bridge'">
+                        <b>Passerelle locale</b> : un petit agent d'impression installé sur le PC de caisse reçoit
+                        les tickets en HTTP (JSON : <code>{"printer", "data"}</code>) et les envoie à l'imprimante.
+                    </div>
+                    <group string="Remarques"><field name="note" nolabel="1" colspan="2"/></group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_adk_pos_printer" model="ir.actions.act_window">
+        <field name="name">Imprimantes &amp; matériel</field>
+        <field name="res_model">adk.pos.printer</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html"><p class="o_view_nocontent_smiling_face">Ajoutez votre première imprimante</p>
+            <p>Navigateur, réseau (IP), USB, Bluetooth ou passerelle locale : choisissez le mode, imprimez une page de test, c'est prêt.</p></field>
+    </record>
+</odoo>

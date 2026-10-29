@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_adk_pos_order_search" model="ir.ui.view">
+        <field name="name">adk.pos.order.search</field>
+        <field name="model">adk.pos.order</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="table_id"/>
+                <field name="server_id"/>
+                <field name="cashier_id"/>
+                <field name="partner_id"/>
+                <field name="session_id"/>
+                <filter string="En cours" name="in_progress" domain="[('state', 'in', ('draft','sent','billing'))]"/>
+                <filter string="Payées" name="paid" domain="[('state', '=', 'paid')]"/>
+                <filter string="Annulées" name="cancelled" domain="[('state', '=', 'cancelled')]"/>
+                <separator/>
+                <filter string="Remboursements" name="refunds" domain="[('is_refund', '=', True)]"/>
+                <filter string="Commandes clients (QR)" name="kiosk" domain="[('source', '=', 'kiosk')]"/>
+                <separator/>
+                <filter string="Aujourd'hui" name="today"
+                        domain="[('date_order', '&gt;=', context_today().strftime('%Y-%m-%d 00:00:00'))]"/>
+                <group expand="0" string="Regrouper par">
+                    <filter string="Serveur" name="group_server" context="{'group_by': 'server_id'}"/>
+                    <filter string="Caissier" name="group_cashier" context="{'group_by': 'cashier_id'}"/>
+                    <filter string="Table" name="group_table" context="{'group_by': 'table_id'}"/>
+                    <filter string="Type" name="group_type" context="{'group_by': 'order_type'}"/>
+                    <filter string="Statut" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Session" name="group_session" context="{'group_by': 'session_id'}"/>
+                    <filter string="Jour" name="group_day" context="{'group_by': 'date_order:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_adk_pos_order_list" model="ir.ui.view">
+        <field name="name">adk.pos.order.list</field>
+        <field name="model">adk.pos.order</field>
+        <field name="arch" type="xml">
+            <list decoration-success="state == 'paid'" decoration-warning="state == 'billing'"
+                  decoration-info="state == 'sent'" decoration-muted="state == 'cancelled'" create="false">
+                <field name="name"/>
+                <field name="date_order"/>
+                <field name="order_type" optional="show"/>
+                <field name="table_id"/>
+                <field name="server_id"/>
+                <field name="cashier_id"/>
+                <field name="payment_method_id" optional="show"/>
+                <field name="amount_total" widget="monetary" sum="Total"/>
+                <field name="tip_amount" widget="monetary" optional="hide"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_adk_pos_order_kanban" model="ir.ui.view">
+        <field name="name">adk.pos.order.kanban</field>
+        <field name="model">adk.pos.order</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="adk_pos_order_kanban" create="false">
+                <field name="name"/>
+                <field name="amount_total"/>
+                <field name="state"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="p-2">
+                            <strong><field name="name"/></strong>
+                            <div t-if="record.table_id.raw_value"><i class="fa fa-cutlery"/> <field name="table_id"/></div>
+                            <div><i class="fa fa-user"/> <field name="server_id"/></div>
+                            <div class="fw-bold"><field name="amount_total" widget="monetary"/></div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_adk_pos_order_form" model="ir.ui.view">
+        <field name="name">adk.pos.order.form</field>
+        <field name="model">adk.pos.order</field>
+        <field name="arch" type="xml">
+            <form string="Commande" create="false">
+                <header>
+                    <button name="action_send_to_kitchen" type="object" string="Envoyer en préparation"
+                            class="btn-primary" invisible="state not in ('draft', 'sent')"/>
+                    <button name="action_go_billing" type="object" string="Passer en facturation"
+                            invisible="state not in ('draft', 'sent')"/>
+                    <button name="action_pay" type="object" string="Valider le paiement"
+                            class="btn-success" invisible="state != 'billing'"/>
+                    <button name="action_open_refund_wizard" type="object" string="↩ Rembourser"
+                            class="btn-warning" invisible="state != 'paid' or is_refund"/>
+                    <button name="action_cancel" type="object" string="Annuler"
+                            invisible="state in ('paid','cancelled')"/>
+                    <button name="action_generate_invoice" type="object" string="Générer la facture"
+                            class="btn-primary" invisible="state != 'paid' or invoice_id or credit_note_id or is_refund"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,sent,billing,paid"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Remboursement" bg_color="text-bg-warning" invisible="not is_refund"/>
+                    <widget name="web_ribbon" title="Annulée" bg_color="text-bg-danger" invisible="state != 'cancelled'"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_invoice" type="object" class="oe_stat_button" icon="fa-file-text-o"
+                                invisible="not invoice_id and not credit_note_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Facture</span>
+                                <field name="invoice_payment_state" readonly="1"/>
+                            </div>
+                        </button>
+                        <button name="action_view_refunds" type="object" class="oe_stat_button" icon="fa-undo"
+                                invisible="not refund_count">
+                            <field name="refund_count" widget="statinfo" string="Remboursements"/>
+                        </button>
+                    </div>
+                    <field name="config_id" invisible="1"/>
+                    <field name="is_refund" invisible="1"/>
+                    <field name="currency_id" invisible="1"/>
+                    <p class="text-muted" invisible="not refund_of_id">
+                        Remboursement de <field name="refund_of_id" readonly="1" nolabel="1"/>
+                    </p>
+                    <group>
+                        <group>
+                            <field name="name" string="Réf. de la commande" readonly="1"/>
+                            <field name="date_order" string="Date" readonly="state in ('paid', 'cancelled')"/>
+                            <field name="session_id" string="Session" readonly="state in ('paid', 'cancelled')"/>
+                            <field name="order_type" readonly="state in ('paid', 'cancelled')"/>
+                            <field name="source" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="table_id" string="Table" readonly="state in ('paid', 'cancelled')"/>
+                            <field name="guests" string="Couverts" readonly="state in ('paid', 'cancelled')"/>
+                            <field name="server_id" string="Serveur / Pris par" readonly="state in ('paid', 'cancelled')"/>
+                            <field name="cashier_id" string="Caissier" readonly="1"/>
+                            <field name="reservation_id" invisible="not reservation_id"/>
+                        </group>
+                    </group>
+                    <group string="Client">
+                        <group>
+                            <field name="partner_id" context="{'default_customer_rank': 1}"
+                                   placeholder="Client divers si vide"/>
+                            <field name="customer_phone"/>
+                        </group>
+                        <group>
+                            <field name="invoice_id" readonly="1" invisible="not invoice_id"/>
+                            <field name="credit_note_id" readonly="1" invisible="not credit_note_id"/>
+                            <field name="invoice_error" readonly="1" invisible="not invoice_error"/>
+                            <field name="delivery_address" invisible="order_type != 'delivery'" readonly="state in ('paid', 'cancelled')"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Produits" name="lines">
+                            <field name="order_line_ids" readonly="state in ('paid', 'cancelled')">
+                                <list editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="course" optional="show"/>
+                                    <field name="qty" string="Quantité"/>
+                                    <field name="qty_sent" optional="hide" readonly="1"/>
+                                    <field name="uom_id" string="UdM" readonly="1" optional="hide"/>
+                                    <field name="price_unit" string="Prix unitaire"/>
+                                    <field name="discount" string="Rem.%"/>
+                                    <field name="tax_ids" widget="many2many_tags" string="Taxes" optional="hide"/>
+                                    <field name="price_subtotal" string="Hors taxes" sum="Total" optional="hide"/>
+                                    <field name="price_total" string="Toutes taxes comprises" sum="Total"/>
+                                    <field name="name" optional="hide" string="Description"/>
+                                    <field name="note" optional="show"/>
+                                </list>
+                            </field>
+                            <group class="oe_subtotal_footer">
+                                <field name="amount_untaxed" string="Total HT"/>
+                                <field name="amount_tax" string="Taxes"/>
+                                <field name="discount_total" string="Dont remises"/>
+                                <field name="tip_amount" string="Pourboire"/>
+                                <field name="amount_total" string="Total" class="oe_subtotal_footer_separator"/>
+                                <field name="amount_paid" string="Payé"/>
+                                <field name="amount_due" string="Reste à payer"/>
+                                <field name="margin" string="Marge"/>
+                                <field name="margin_percent" string="Marge (%)" widget="percentage"/>
+                            </group>
+                        </page>
+                        <page string="Paiements" name="payments">
+                            <field name="payment_ids" readonly="1">
+                                <list>
+                                    <field name="date"/>
+                                    <field name="payment_method_id"/>
+                                    <field name="reference"/>
+                                    <field name="cashier_id"/>
+                                    <field name="tendered" optional="hide"/>
+                                    <field name="change_given" optional="hide"/>
+                                    <field name="amount" sum="Total"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                </list>
+                            </field>
+                            <group>
+                                <field name="date_paid" readonly="1"/>
+                                <field name="amount_change" readonly="1"/>
+                            </group>
+                        </page>
+                        <page string="Cuisine" name="kitchen" invisible="not kitchen_item_ids">
+                            <field name="kitchen_item_ids" readonly="1">
+                                <list>
+                                    <field name="date_sent"/>
+                                    <field name="batch_no"/>
+                                    <field name="name"/>
+                                    <field name="qty"/>
+                                    <field name="course"/>
+                                    <field name="station_id"/>
+                                    <field name="note"/>
+                                    <field name="state" widget="badge"/>
+                                    <field name="date_ready" optional="hide"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <group>
+                                <field name="note"/>
+                                <field name="cancel_reason" invisible="not cancel_reason"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_adk_pos_order" model="ir.actions.act_window">
+        <field name="name">Commandes</field>
+        <field name="res_model">adk.pos.order</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="search_view_id" ref="view_adk_pos_order_search"/>
+        <field name="context">{'search_default_today': 1}</field>
+    </record>
+
+    <!-- ===== Paiements ===== -->
+    <record id="view_adk_pos_payment_search" model="ir.ui.view">
+        <field name="name">adk.pos.payment.search</field>
+        <field name="model">adk.pos.payment</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="order_id"/>
+                <field name="payment_method_id"/>
+                <field name="reference"/>
+                <field name="cashier_id"/>
+                <filter string="Espèces" name="cash" domain="[('is_cash', '=', True)]"/>
+                <filter string="Remboursements" name="refund" domain="[('is_refund', '=', True)]"/>
+                <group expand="0" string="Regrouper par">
+                    <filter string="Mode de paiement" name="g_method" context="{'group_by': 'payment_method_id'}"/>
+                    <filter string="Caissier" name="g_cashier" context="{'group_by': 'cashier_id'}"/>
+                    <filter string="Session" name="g_session" context="{'group_by': 'session_id'}"/>
+                    <filter string="Jour" name="g_day" context="{'group_by': 'date:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_adk_pos_payment_list" model="ir.ui.view">
+        <field name="name">adk.pos.payment.list</field>
+        <field name="model">adk.pos.payment</field>
+        <field name="arch" type="xml">
+            <list create="false" edit="false" decoration-danger="is_refund">
+                <field name="date"/>
+                <field name="order_id"/>
+                <field name="session_id" optional="show"/>
+                <field name="payment_method_id"/>
+                <field name="reference"/>
+                <field name="cashier_id"/>
+                <field name="tendered" optional="hide"/>
+                <field name="change_given" optional="hide"/>
+                <field name="amount" sum="Total"/>
+                <field name="is_refund" column_invisible="1"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_adk_pos_payment_pivot" model="ir.ui.view">
+        <field name="name">adk.pos.payment.pivot</field>
+        <field name="model">adk.pos.payment</field>
+        <field name="arch" type="xml">
+            <pivot string="Analyse des paiements">
+                <field name="payment_method_id" type="row"/>
+                <field name="date" interval="day" type="col"/>
+                <field name="amount" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_adk_pos_payment" model="ir.actions.act_window">
+        <field name="name">Paiements</field>
+        <field name="res_model">adk.pos.payment</field>
+        <field name="view_mode">list,pivot</field>
+        <field name="search_view_id" ref="view_adk_pos_payment_search"/>
+    </record>
+
+    <!-- ===== Remboursement (assistant) ===== -->
+    <record id="view_adk_pos_refund_wizard_form" model="ir.ui.view">
+        <field name="name">adk.pos.refund.wizard.form</field>
+        <field name="model">adk.pos.refund.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Rembourser">
+                <group>
+                    <field name="order_id"/>
+                    <field name="allowed_method_ids" invisible="1"/>
+                    <field name="payment_method_id" options="{'no_create': True}"/>
+                    <field name="reason" placeholder="Ex: plat froid, erreur de commande…"/>
+                </group>
+                <field name="line_ids">
+                    <list editable="bottom" create="false" delete="false">
+                        <field name="order_line_id" readonly="1"/>
+                        <field name="qty_available"/>
+                        <field name="qty"/>
+                    </list>
+                </field>
+                <p class="text-muted">Saisissez la quantité à rembourser pour chaque article (0 = pas de remboursement).</p>
+                <footer>
+                    <button string="Rembourser" type="object" name="action_confirm" class="btn-primary"/>
+                    <button string="Annuler" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="paperformat_adk_pos_receipt" model="report.paperformat">
+        <field name="name">ADK POS - Ticket 80 mm</field>
+        <field name="default" eval="False"/>
+        <field name="format">custom</field>
+        <field name="page_height">200</field>
+        <field name="page_width">80</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">4</field>
+        <field name="margin_bottom">4</field>
+        <field name="margin_left">4</field>
+        <field name="margin_right">4</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">0</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <!-- Corps commun : ticket de caisse ET addition (pré-ticket) -->
+    <template id="report_receipt_body" name="ADK POS - Corps du ticket">
+        <div class="adk_receipt" style="font-family: 'Courier New', monospace; font-size: 12px; width: 100%; max-width: 300px; margin: 0 auto;">
+            <div style="text-align:center;">
+                <div style="font-size:16px; font-weight:bold;" t-out="order.config_id.name"/>
+                <div t-if="order.company_id.street" t-out="order.company_id.street"/>
+                <div t-if="order.company_id.phone" t-out="order.company_id.phone"/>
+                <div t-if="order.config_id.receipt_header" style="white-space:pre-line;" t-out="order.config_id.receipt_header"/>
+                <div t-if="is_bill" style="margin-top:6px; font-weight:bold; font-size:14px; border:1px solid #000; padding:2px;">
+                    ADDITION (non acquittée)
+                </div>
+                <div t-if="order.refund_of_id" style="margin-top:6px; font-weight:bold;">
+                    REMBOURSEMENT de <t t-out="order.refund_of_id.name"/>
+                </div>
+            </div>
+            <div style="border-top:1px dashed #000; margin:6px 0;"/>
+            <div>
+                N° : <b t-out="order.name"/><br/>
+                Date : <span t-out="order.date_paid or order.date_order" t-options="{'widget': 'datetime'}"/><br/>
+                <t t-if="order.table_id">Table : <b t-out="order.table_id.name"/>
+                    <t t-if="order.guests"> (<t t-out="order.guests"/> couv.)</t><br/></t>
+                Type : <span t-out="dict(order._fields['order_type'].selection).get(order.order_type)"/><br/>
+                Serveur : <span t-out="order.server_id.name"/><br/>
+                <t t-if="order.cashier_id and not is_bill">Caissier : <span t-out="order.cashier_id.name"/><br/></t>
+                <t t-if="order.partner_id">Client : <span t-out="order.partner_id.name"/><br/></t>
+                <t t-if="order.order_type == 'delivery' and order.delivery_address">Livraison : <span t-out="order.delivery_address"/><br/></t>
+                <t t-if="order.customer_phone">Tél : <span t-out="order.customer_phone"/><br/></t>
+            </div>
+            <div style="border-top:1px dashed #000; margin:6px 0;"/>
+            <table style="width:100%; border-collapse:collapse;">
+                <t t-foreach="order.order_line_ids" t-as="line">
+                    <tr>
+                        <td style="vertical-align:top; padding:2px 4px 2px 0; white-space:nowrap;"><t t-out="'%g' % line.qty"/> x</td>
+                        <td style="vertical-align:top; padding:2px 0;">
+                            <span t-out="line.name"/>
+                            <t t-if="line.discount"><br/><i>Remise <t t-out="'%g' % line.discount"/> %</i></t>
+                            <t t-if="line.note"><br/><i>→ <t t-out="line.note"/></i></t>
+                        </td>
+                        <td t-if="not basic" style="vertical-align:top; text-align:right; padding:2px 0 2px 4px; white-space:nowrap;" t-out="order._fmt(line.price_total)"/>
+                    </tr>
+                </t>
+            </table>
+            <div style="border-top:1px dashed #000; margin:6px 0;"/>
+            <table t-if="not basic" style="width:100%; border-collapse:collapse;">
+                <tr t-if="order.amount_tax">
+                    <td>Total HT</td><td style="text-align:right;" t-out="order._fmt(order.amount_untaxed)"/>
+                </tr>
+                <tr t-if="order.amount_tax">
+                    <td>Taxes</td><td style="text-align:right;" t-out="order._fmt(order.amount_tax)"/>
+                </tr>
+                <tr t-if="order.discount_total">
+                    <td>Remises accordées</td><td style="text-align:right;" t-out="order._fmt(order.discount_total)"/>
+                </tr>
+                <tr t-if="order.tip_amount">
+                    <td>Pourboire</td><td style="text-align:right;" t-out="order._fmt(order.tip_amount)"/>
+                </tr>
+                <tr style="font-weight:bold; font-size:15px;">
+                    <td>TOTAL</td><td style="text-align:right;" t-out="order._fmt(order.amount_total + order.tip_amount)"/>
+                </tr>
+            </table>
+            <t t-if="not is_bill and not basic and order.payment_ids">
+                <div style="border-top:1px dashed #000; margin:6px 0;"/>
+                <table style="width:100%; border-collapse:collapse;">
+                    <tr t-foreach="order.payment_ids" t-as="pay">
+                        <td><t t-out="pay.payment_method_id.name"/><t t-if="pay.reference"> (<t t-out="pay.reference"/>)</t></td>
+                        <td style="text-align:right;" t-out="order._fmt(pay.amount)"/>
+                    </tr>
+                    <tr t-if="order.amount_change">
+                        <td>Monnaie rendue</td><td style="text-align:right;" t-out="order._fmt(order.amount_change)"/>
+                    </tr>
+                </table>
+            </t>
+            <div style="border-top:1px dashed #000; margin:6px 0;"/>
+            <div style="text-align:center;">
+                <div t-if="order.config_id.receipt_footer" style="white-space:pre-line;" t-out="order.config_id.receipt_footer"/>
+                <div>Merci de votre visite !</div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Version écran / impression directe navigateur -->
+    <template id="report_receipt_document" name="Ticket de caisse ADK POS">
+        <html>
+            <head>
+                <meta charset="utf-8"/>
+                <meta name="viewport" content="width=device-width, initial-scale=1"/>
+                <title t-out="order.name"/>
+                <style>
+                    body { margin: 8px; background: #fff; color: #000; }
+                    @media print { body { margin: 0; } .adk_noprint { display: none; } @page { margin: 4mm; } }
+                    .adk_noprint { text-align: center; margin: 10px; }
+                    .adk_noprint button { padding: 8px 18px; font-size: 14px; cursor: pointer; }
+                </style>
+            </head>
+            <body>
+                <div class="adk_noprint"><button onclick="window.print()">Imprimer</button></div>
+                <t t-call="adk_pos.report_receipt_body"/>
+                <script>window.addEventListener('load', function () { setTimeout(function () { window.print(); }, 300); });</script>
+            </body>
+        </html>
+    </template>
+
+    <!-- Version PDF téléchargeable -->
+    <template id="report_receipt_document_pdf" name="Ticket de caisse ADK POS (PDF)">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="order">
+                <t t-set="is_bill" t-value="False"/>
+                <t t-set="basic" t-value="False"/>
+                <div class="article" t-att-data-oe-model="order._name" t-att-data-oe-id="order.id">
+                    <div class="page">
+                        <t t-call="adk_pos.report_receipt_body"/>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_receipt_pdf" model="ir.actions.report">
+        <field name="name">Ticket de caisse (PDF)</field>
+        <field name="model">adk.pos.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">adk_pos.report_receipt_document_pdf</field>
+        <field name="report_file">adk_pos.report_receipt_document_pdf</field>
+        <field name="print_report_name">'Ticket_%s' % (object.name.replace('/', '_'))</field>
+        <field name="paperformat_id" ref="paperformat_adk_pos_receipt"/>
+        <field name="binding_model_id" ref="model_adk_pos_order"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- Bon de cuisine / bar -->
+    <template id="report_kitchen_ticket" name="Bon de préparation ADK POS">
+        <html>
+            <head>
+                <meta charset="utf-8"/>
+                <title>Bon de préparation</title>
+                <style>
+                    body { font-family: 'Courier New', monospace; font-size: 15px; margin: 8px; max-width: 300px; }
+                    .big { font-size: 22px; font-weight: bold; }
+                    .line { border-top: 2px dashed #000; margin: 8px 0; }
+                    .course { font-weight: bold; text-transform: uppercase; border-bottom: 1px solid #000; margin-top: 8px; }
+                    .note { font-style: italic; padding-left: 20px; }
+                    @media print { @page { margin: 3mm; } }
+                </style>
+            </head>
+            <body>
+                <div class="big" t-if="order.table_id">TABLE <t t-out="order.table_id.name"/></div>
+                <div class="big" t-else="">À EMPORTER / <t t-out="dict(order._fields['order_type'].selection).get(order.order_type)"/></div>
+                <div><t t-out="order.name"/> — envoi n°<t t-out="batch"/> — <t t-out="order.server_id.name"/></div>
+                <div t-if="order.guests"><t t-out="order.guests"/> couvert(s)</div>
+                <div class="line"/>
+                <t t-foreach="courses" t-as="course">
+                    <div class="course" t-out="course['label']"/>
+                    <div t-foreach="course['items']" t-as="item">
+                        <b><t t-out="'%g' % item.qty"/> x</b> <t t-out="item.name"/>
+                        <div class="note" t-if="item.note" t-out="item.note"/>
+                    </div>
+                </t>
+                <div class="line"/>
+                <div t-if="order.note" class="note" t-out="order.note"/>
+                <script>window.addEventListener('load', function () { setTimeout(function () { window.print(); }, 300); });</script>
+            </body>
+        </html>
+    </template>
+
+    <!-- QR codes des tables -->
+    <template id="report_table_qrs" name="QR codes des tables">
+        <html>
+            <head>
+                <meta charset="utf-8"/>
+                <title>QR codes des tables</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 20px; }
+                    .grid { display: flex; flex-wrap: wrap; gap: 20px; }
+                    .card { width: 220px; border: 2px solid #2C3357; border-radius: 12px; padding: 14px; text-align: center; page-break-inside: avoid; }
+                    .card h2 { margin: 0 0 6px; font-size: 24px; }
+                    .card p { margin: 6px 0 0; font-size: 12px; color: #555; }
+                    @media print { @page { margin: 10mm; } }
+                </style>
+            </head>
+            <body>
+                <h1 t-out="config.name"/>
+                <div class="grid">
+                    <div class="card" t-foreach="tables" t-as="table">
+                        <h2>Table <t t-out="table.name"/></h2>
+                        <img t-att-src="'/report/barcode/?barcode_type=QR&amp;value=%s&amp;width=180&amp;height=180' % url_quote(base_url + '/adk_pos/kiosk/%s?table_id=%s' % (config.id, table.id))" width="180" height="180" alt="QR"/>
+                        <p>Scannez pour commander depuis votre table</p>
+                    </div>
+                </div>
+                <script>window.addEventListener('load', function () { setTimeout(function () { window.print(); }, 500); });</script>
+            </body>
+        </html>
+    </template>
+
+</odoo>

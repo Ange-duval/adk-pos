@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_adk_pos_pin_wizard_form" model="ir.ui.view">
+        <field name="name">adk.pos.pin.wizard.form</field>
+        <field name="model">adk.pos.pin.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Définir un code PIN">
+                <group>
+                    <field name="user_id"/>
+                    <field name="pin" password="True"/>
+                    <field name="pin_confirm" password="True"/>
+                </group>
+                <footer>
+                    <button string="Enregistrer" type="object" name="action_confirm" class="btn-primary"/>
+                    <button string="Annuler" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_adk_pos_pin_wizard" model="ir.actions.act_window">
+        <field name="name">Définir un code PIN</field>
+        <field name="res_model">adk.pos.pin.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="view_adk_pos_users_pin_list" model="ir.ui.view">
+        <field name="name">res.users.adk.pos.pin.list</field>
+        <field name="model">res.users</field>
+        <field name="arch" type="xml">
+            <list create="false" edit="false" delete="false">
+                <field name="name"/>
+                <field name="login"/>
+                <field name="adk_pos_has_pin" readonly="1"/>
+                <button name="adk_pos_unlock_pin" type="object" string="Débloquer le PIN" icon="fa-unlock"/>
+                <button name="%(action_adk_pos_pin_wizard)d" type="action" string="Définir le code PIN"
+                        class="btn-primary" context="{'default_user_id': id}"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_adk_pos_users_pin" model="ir.actions.act_window">
+        <field name="name">Codes PIN collaborateurs</field>
+        <field name="res_model">res.users</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_adk_pos_users_pin_list"/>
+        <field name="domain">[('share', '=', False)]</field>
+        <field name="help" type="html"><p class="o_view_nocontent_smiling_face">Sélectionnez un collaborateur puis utilisez le bouton "Définir le code PIN" ci-dessous.</p></field>
+    </record>
+
+</odoo>

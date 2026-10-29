@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_adk_pos_reservation_search" model="ir.ui.view">
+        <field name="name">adk.pos.reservation.search</field>
+        <field name="model">adk.pos.reservation</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="customer_name"/>
+                <field name="phone"/>
+                <field name="table_ids"/>
+                <filter string="À venir" name="upcoming" domain="[('state', '=', 'confirmed')]"/>
+                <filter string="Installées" name="seated" domain="[('state', '=', 'seated')]"/>
+                <filter string="À partir d'aujourd'hui" name="today"
+                        domain="[('date_start', '&gt;=', context_today().strftime('%Y-%m-%d 00:00:00'))]"/>
+                <filter string="Non présentés" name="no_show" domain="[('state', '=', 'no_show')]"/>
+                <group expand="0" string="Regrouper par">
+                    <filter string="Statut" name="g_state" context="{'group_by': 'state'}"/>
+                    <filter string="Point de vente" name="g_config" context="{'group_by': 'config_id'}"/>
+                    <filter string="Jour" name="g_day" context="{'group_by': 'date_start:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_adk_pos_reservation_list" model="ir.ui.view">
+        <field name="name">adk.pos.reservation.list</field>
+        <field name="model">adk.pos.reservation</field>
+        <field name="arch" type="xml">
+            <list decoration-success="state == 'seated'" decoration-muted="state in ('done', 'cancelled')"
+                  decoration-danger="state == 'no_show'">
+                <field name="name"/>
+                <field name="date_start"/>
+                <field name="customer_name"/>
+                <field name="phone"/>
+                <field name="guests"/>
+                <field name="table_ids" widget="many2many_tags"/>
+                <field name="config_id" optional="show"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_adk_pos_reservation_form" model="ir.ui.view">
+        <field name="name">adk.pos.reservation.form</field>
+        <field name="model">adk.pos.reservation</field>
+        <field name="arch" type="xml">
+            <form string="Réservation">
+                <header>
+                    <button name="action_confirm" type="object" string="Reconfirmer" invisible="state not in ('cancelled', 'no_show')"/>
+                    <button name="action_no_show" type="object" string="Non présenté" invisible="state != 'confirmed'"/>
+                    <button name="action_cancel" type="object" string="Annuler" invisible="state not in ('confirmed', 'seated')"/>
+                    <button name="action_done" type="object" string="Terminer" class="btn-primary" invisible="state != 'seated'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="confirmed,seated,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="config_id"/>
+                            <field name="partner_id"/>
+                            <field name="customer_name"/>
+                            <field name="phone" widget="phone"/>
+                            <field name="source"/>
+                        </group>
+                        <group>
+                            <field name="date_start"/>
+                            <field name="duration"/>
+                            <field name="date_end"/>
+                            <field name="guests"/>
+                            <field name="table_ids" widget="many2many_tags"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="note"/>
+                        <field name="order_id" invisible="not order_id"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_adk_pos_reservation_calendar" model="ir.ui.view">
+        <field name="name">adk.pos.reservation.calendar</field>
+        <field name="model">adk.pos.reservation</field>
+        <field name="arch" type="xml">
+            <calendar string="Réservations" date_start="date_start" date_stop="date_end"
+                      color="state" mode="week" quick_create="0">
+                <field name="customer_name"/>
+                <field name="guests"/>
+                <field name="table_ids" widget="many2many_tags"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="view_adk_pos_reservation_kanban" model="ir.ui.view">
+        <field name="name">adk.pos.reservation.kanban</field>
+        <field name="model">adk.pos.reservation</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state">
+                <field name="state"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="p-2">
+                            <strong><field name="customer_name"/></strong>
+                            <div><i class="fa fa-clock-o"/> <field name="date_start"/></div>
+                            <div><i class="fa fa-users"/> <field name="guests"/>
+                                <field name="table_ids" widget="many2many_tags"/></div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="action_adk_pos_reservation" model="ir.actions.act_window">
+        <field name="name">Réservations</field>
+        <field name="res_model">adk.pos.reservation</field>
+        <field name="view_mode">calendar,list,kanban,form</field>
+        <field name="search_view_id" ref="view_adk_pos_reservation_search"/>
+        <field name="help" type="html"><p class="o_view_nocontent_smiling_face">
+            Créez votre première réservation : la table apparaît automatiquement « Réservée » sur le plan de salle avant l'arrivée du client.
+        </p></field>
+    </record>
+
+</odoo>

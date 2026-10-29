@@ -1,0 +1,16 @@
+[
+ {"name":"T1","x":60,"y":160,"w":80,"h":80,"shape":"round","seats":2},
+ {"name":"T2","x":190,"y":160,"w":80,"h":80,"shape":"round","seats":2},
+ {"name":"T3","x":320,"y":160,"w":80,"h":80,"shape":"round","seats":2},
+ {"name":"T4","x":460,"y":150,"w":100,"h":100,"shape":"square","seats":4},
+ {"name":"T5","x":610,"y":150,"w":100,"h":100,"shape":"square","seats":4},
+ {"name":"T6","x":60,"y":300,"w":100,"h":100,"shape":"square","seats":4},
+ {"name":"T7","x":210,"y":300,"w":100,"h":100,"shape":"square","seats":4},
+ {"name":"T8","x":360,"y":300,"w":180,"h":100,"shape":"rectangle","seats":6},
+ {"name":"T9","x":600,"y":300,"w":100,"h":100,"shape":"square","seats":4},
+ {"name":"T10","x":60,"y":450,"w":180,"h":100,"shape":"rectangle","seats":6},
+ {"name":"T11","x":290,"y":460,"w":90,"h":90,"shape":"square","seats":4},
+ {"name":"T12","x":640,"y":450,"w":100,"h":100,"shape":"square","seats":4},
+ {"name":"T13","x":770,"y":190,"w":80,"h":80,"shape":"round","seats":2},
+ {"name":"T14","x":770,"y":330,"w":80,"h":80,"shape":"round","seats":2}
+]

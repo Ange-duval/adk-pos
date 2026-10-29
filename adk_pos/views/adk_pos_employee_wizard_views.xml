@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_adk_pos_employee_wizard_form" model="ir.ui.view">
+        <field name="name">adk.pos.employee.wizard.form</field>
+        <field name="model">adk.pos.employee.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Nouveau membre du personnel">
+                <group>
+                    <field name="name" placeholder="Ex: Aïcha Ngo"/>
+                    <field name="login" placeholder="Ex: aicha@monrestaurant.cm"/>
+                    <field name="role" widget="radio"/>
+                    <field name="config_id"/>
+                    <field name="pin" password="True"/>
+                    <field name="pin_confirm" password="True"/>
+                </group>
+                <footer>
+                    <button string="Créer" type="object" name="action_confirm" class="btn-primary"/>
+                    <button string="Annuler" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_adk_pos_employee_wizard" model="ir.actions.act_window">
+        <field name="name">Nouveau membre du personnel</field>
+        <field name="res_model">adk.pos.employee.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

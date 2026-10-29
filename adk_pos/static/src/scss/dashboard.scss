@@ -1,0 +1,159 @@
+.adk_pos_dashboard {
+    padding: 24px;
+    background: #F6F7FB;
+    min-height: 100%;
+
+    .adk_dashboard_header {
+        margin-bottom: 24px;
+        h2 {
+            font-weight: 600;
+            color: #2C3357;
+            margin-bottom: 2px;
+        }
+        .adk_dashboard_subtitle {
+            color: #8A8FA3;
+            font-size: 13px;
+        }
+    }
+
+    .adk_dashboard_loading {
+        text-align: center;
+        padding: 60px 0;
+        color: #8A8FA3;
+        font-size: 15px;
+    }
+
+    .adk_kpi_grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+        gap: 18px;
+        margin-bottom: 28px;
+    }
+
+    .adk_kpi_card {
+        background: #FFFFFF;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 4px 18px rgba(44, 51, 87, 0.06);
+        cursor: pointer;
+        transition: transform .15s ease, box-shadow .15s ease;
+        border-left: 4px solid transparent;
+
+        &:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 24px rgba(44, 51, 87, 0.12);
+        }
+
+        .adk_kpi_icon {
+            font-size: 20px;
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            color: #fff;
+        }
+
+        .adk_kpi_value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2C3357;
+        }
+
+        .adk_kpi_label {
+            font-size: 12.5px;
+            color: #8A8FA3;
+            margin-top: 4px;
+        }
+
+        &.adk_kpi_primary { border-left-color: #6C63FF; .adk_kpi_icon { background: #6C63FF; } }
+        &.adk_kpi_success { border-left-color: #2ECC9E; .adk_kpi_icon { background: #2ECC9E; } }
+        &.adk_kpi_info    { border-left-color: #3FA9F5; .adk_kpi_icon { background: #3FA9F5; } }
+        &.adk_kpi_warning { border-left-color: #F5A623; .adk_kpi_icon { background: #F5A623; } }
+        &.adk_kpi_dark    { border-left-color: #2C3357; .adk_kpi_icon { background: #2C3357; } }
+    }
+
+    .adk_panels_grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+        gap: 18px;
+    }
+
+    .adk_panel {
+        background: #FFFFFF;
+        border-radius: 16px;
+        padding: 22px;
+        box-shadow: 0 4px 18px rgba(44, 51, 87, 0.06);
+
+        h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2C3357;
+            margin-bottom: 16px;
+        }
+    }
+
+    .adk_empty {
+        color: #B0B4C3;
+        font-size: 13px;
+        padding: 12px 0;
+    }
+
+    .adk_bar_row {
+        display: grid;
+        grid-template-columns: 120px 1fr 70px;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 12px;
+        font-size: 12.5px;
+    }
+
+    .adk_bar_label {
+        color: #4A4F6A;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .adk_bar_track {
+        background: #EEF0F7;
+        border-radius: 8px;
+        height: 10px;
+        overflow: hidden;
+    }
+
+    .adk_bar_fill {
+        height: 100%;
+        border-radius: 8px;
+        transition: width .4s ease;
+    }
+
+    .adk_bar_purple { background: linear-gradient(90deg, #6C63FF, #9F97FF); }
+    .adk_bar_teal { background: linear-gradient(90deg, #2ECC9E, #6EE7C4); }
+
+    .adk_bar_value {
+        text-align: right;
+        color: #2C3357;
+        font-weight: 600;
+    }
+}
+
+// Cartes du plan de salle (tables)
+.adk_table_card {
+    border-radius: 12px;
+    padding: 14px;
+    color: #fff;
+    font-weight: 500;
+
+    &.adk_table_free { background: linear-gradient(135deg, #2ECC9E, #22B98A); }
+    &.adk_table_occupied { background: linear-gradient(135deg, #FF6B6B, #E85555); }
+    &.adk_table_reserved { background: linear-gradient(135deg, #F5A623, #E39413); }
+    &.adk_table_billing { background: linear-gradient(135deg, #6C63FF, #574FE0); }
+
+    .badge {
+        margin-top: 6px;
+        font-size: 11px;
+    }
+}

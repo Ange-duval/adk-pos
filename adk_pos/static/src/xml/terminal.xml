@@ -1,0 +1,1028 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <!-- Pavé numérique générique : npFn = fonction appelée avec la touche, npDot = afficher le point -->
+    <t t-name="adk_pos.Numpad">
+        <div class="adk_numpad">
+            <button t-foreach="npDot ? numpadKeysDot : numpadKeys" t-as="k" t-key="k"
+                    class="adk_numpad_key" t-on-click="() => npFn(k)" t-esc="k"/>
+        </div>
+    </t>
+
+    <t t-name="adk_pos.Terminal">
+        <div t-attf-class="adk_terminal #{themeClass}" t-translation="off">
+
+            <!-- ====== CHARGEMENT ====== -->
+            <div t-if="state.loading" class="adk_center_screen">
+                <i class="fa fa-spinner fa-spin fa-2x"/>
+            </div>
+
+            <!-- ====== 1. CHOIX DU POINT DE VENTE ====== -->
+            <div t-elif="state.view === 'select_config'" class="adk_center_screen">
+                <h1 class="adk_title">Point de Vente</h1>
+                <p class="adk_subtitle">Choisissez votre point de vente</p>
+                <div class="adk_config_grid">
+                    <div t-foreach="state.configs" t-as="config" t-key="config.id"
+                         t-attf-class="adk_config_card #{config.colorTheme}"
+                         t-on-click="() => this.selectConfig(config)">
+                        <i t-attf-class="fa #{config.iconClass} fa-3x"/>
+                        <div class="adk_config_name" t-esc="config.name"/>
+                        <div class="adk_config_status">
+                            <span t-if="config.hasOpenSession" class="adk_pill adk_pill_green">● Caisse ouverte</span>
+                            <span t-else="" class="adk_pill adk_pill_grey">Caisse fermée</span>
+                        </div>
+                    </div>
+                    <div t-if="!state.configs.length" class="adk_welcome">
+                        <div class="adk_welcome_icon"><i class="fa fa-rocket"/></div>
+                        <h2>Bienvenue dans ADK Point de Vente</h2>
+                        <p>Votre espace est vierge. Créez votre premier point de vente en une minute : nom, type, tables, postes de préparation et code PIN.</p>
+                        <button class="adk_btn adk_btn_primary adk_btn_big" t-on-click="openSetupWizard"><i class="fa fa-magic"/> Créer mon premier point de vente</button>
+                    </div>
+                </div>
+                <button class="adk_btn adk_btn_ghost mt-4" t-on-click="goBackend">
+                    <i class="fa fa-arrow-left"/> Retour à Odoo
+                </button>
+            </div>
+
+            <!-- ====== 2. IDENTIFICATION (PIN) ====== -->
+            <div t-elif="state.view === 'select_employee'" class="adk_center_screen">
+                <h1 class="adk_title" t-esc="state.cfg.name"/>
+                <t t-if="!state.pendingEmployee">
+                    <p class="adk_subtitle">Qui êtes-vous ?</p>
+                    <div class="adk_emp_grid">
+                        <div t-foreach="state.cfg.employees" t-as="emp" t-key="emp.id"
+                             t-attf-class="adk_emp_card #{emp.has_pin ? '' : 'adk_disabled'}"
+                             t-on-click="() => emp.has_pin and this.chooseEmployee(emp)">
+                            <div class="adk_avatar" t-esc="emp.name.charAt(0).toUpperCase()"/>
+                            <div class="adk_emp_name" t-esc="emp.name"/>
+                            <span t-attf-class="adk_pill adk_role_#{emp.role}">
+                                <t t-esc="{manager: 'Manager', cashier: 'Caissier', server: 'Serveur'}[emp.role] || ''"/>
+                            </span>
+                            <div t-if="!emp.has_pin" class="adk_hint">PIN non défini</div>
+                        </div>
+                        <div t-if="!state.cfg.employees.length" class="adk_empty">
+                            Aucun collaborateur. Ajoutez-en depuis la fiche du point de vente (onglet Équipe).
+                        </div>
+                    </div>
+                    <button class="adk_btn adk_btn_ghost mt-4" t-on-click="backToConfigs">
+                        <i class="fa fa-arrow-left"/> Changer de point de vente
+                    </button>
+                </t>
+                <t t-else="">
+                    <div class="adk_pin_box">
+                        <div class="adk_avatar adk_avatar_big" t-esc="state.pendingEmployee.name.charAt(0).toUpperCase()"/>
+                        <h2 t-esc="state.pendingEmployee.name"/>
+                        <div class="adk_pin_dots">
+                            <span t-foreach="[0,1,2,3,4,5]" t-as="i" t-key="i"
+                                  t-attf-class="adk_pin_dot #{i &lt; state.pinInput.length ? 'filled' : ''}"/>
+                        </div>
+                        <div class="adk_pin_error" t-if="state.pinError" t-esc="state.pinError"/>
+                        <t t-set="npFn" t-value="(k) => this.pinKey(k)"/>
+                        <t t-set="npDot" t-value="false"/>
+                        <t t-call="adk_pos.Numpad"/>
+                        <div class="adk_row mt-3">
+                            <button class="adk_btn adk_btn_ghost" t-on-click="cancelEmployee">Retour</button>
+                            <button class="adk_btn adk_btn_primary" t-on-click="confirmPin">Valider</button>
+                        </div>
+                    </div>
+                </t>
+            </div>
+
+            <!-- ====== 3. OUVERTURE DE CAISSE ====== -->
+            <div t-elif="state.view === 'open_session'" class="adk_center_screen">
+                <h1 class="adk_title" t-esc="state.cfg.name"/>
+                <t t-if="isCashier">
+                    <p class="adk_subtitle">Ouverture de caisse — comptez le fond de caisse</p>
+                    <div class="adk_card adk_count_card">
+                        <div class="adk_count_grid">
+                            <div t-foreach="state.cfg.denominations" t-as="d" t-key="d" class="adk_count_row">
+                                <span class="adk_count_denom" t-esc="formatMoney(d)"/>
+                                <button class="adk_round_btn" t-on-click="() => this.changeCount(d, -1)">−</button>
+                                <span class="adk_count_qty" t-esc="state.m.counts[d] || 0"/>
+                                <button class="adk_round_btn" t-on-click="() => this.changeCount(d, 1)">+</button>
+                            </div>
+                        </div>
+                        <div class="adk_field">
+                            <label>Fond de caisse total</label>
+                            <input type="text" inputmode="decimal" t-model="state.m.balance" placeholder="0"/>
+                        </div>
+                        <div class="adk_row">
+                            <button class="adk_btn adk_btn_ghost" t-on-click="backToConfigs">Annuler</button>
+                            <button class="adk_btn adk_btn_primary" t-on-click="openSession">
+                                <i class="fa fa-unlock"/> Ouvrir la caisse
+                            </button>
+                        </div>
+                    </div>
+                </t>
+                <t t-else="">
+                    <p class="adk_subtitle">La caisse n'est pas encore ouverte. Un caissier ou un manager doit l'ouvrir.</p>
+                    <button class="adk_btn adk_btn_ghost" t-on-click="backToConfigs">Retour</button>
+                </t>
+            </div>
+
+            <!-- ====== 4. ÉCRAN PRINCIPAL ====== -->
+            <div t-elif="state.view === 'main'" class="adk_main">
+
+                <!-- Barre du haut -->
+                <div class="adk_topbar">
+                    <div class="adk_topbar_left">
+                        <button class="adk_icon_btn" t-on-click="toggleMenu"><i class="fa fa-bars"/></button>
+                        <strong t-esc="state.cfg.name"/>
+                        <span class="adk_pill adk_pill_green" t-if="state.session">● Session ouverte</span>
+                    </div>
+                    <div class="adk_topbar_right">
+                        <span class="adk_user"><i class="fa fa-user-circle"/> <t t-esc="state.employee.name"/></span>
+                        <button class="adk_icon_btn" title="Mode clair / sombre" t-on-click="toggleDark"><i t-attf-class="fa #{state.dark ? 'fa-sun-o' : 'fa-moon-o'}"/></button>
+                        <button class="adk_icon_btn" title="Verrouiller" t-on-click="lockTerminal"><i class="fa fa-lock"/></button>
+                    </div>
+                </div>
+
+                <!-- Menu latéral -->
+                <div t-if="state.showMenu" class="adk_menu_overlay" t-on-click="toggleMenu">
+                    <div class="adk_menu" t-on-click.stop="() => this.noop()">
+                        <div class="adk_menu_title">Menu</div>
+                        <button class="adk_menu_item" t-on-click="() => this.menuAction('openKitchenScreen')"><i class="fa fa-fire"/> Écran cuisine</button>
+                        <button class="adk_menu_item" t-if="isManager and state.cfg.use_tables" t-on-click="toggleEditMode"><i class="fa fa-th-large"/> Modifier le plan de salle</button>
+                        <button class="adk_menu_item" t-if="isCashier" t-on-click="() => this.menuAction('openCashMove')"><i class="fa fa-exchange"/> Entrée / Sortie de caisse</button>
+                        <button class="adk_menu_item" t-if="isCashier" t-on-click="() => this.menuAction('openXReport')"><i class="fa fa-file-text-o"/> Rapport X (en cours)</button>
+                        <button class="adk_menu_item" t-on-click="() => this.menuAction('openKiosk')"><i class="fa fa-qrcode"/> QR &amp; Kiosque client</button>
+                        <button class="adk_menu_item" t-on-click="() => this.menuAction('openPrinters')"><i class="fa fa-print"/> Imprimantes &amp; matériel</button>
+                        <button class="adk_menu_item" t-if="isCashier and state.cfg.has_printers" t-on-click="() => this.menuAction('openCashDrawer')"><i class="fa fa-inbox"/> Ouvrir le tiroir-caisse</button>
+                        <button class="adk_menu_item" t-if="isManager" t-on-click="() => this.menuAction('createProduct')"><i class="fa fa-plus-circle"/> Nouveau produit</button>
+                        <button class="adk_menu_item" t-on-click="togglePrintKitchen">
+                            <i t-attf-class="fa #{state.printKitchen ? 'fa-check-square-o' : 'fa-square-o'}"/> Imprimer le bon cuisine à l'envoi
+                        </button>
+                        <button class="adk_menu_item adk_menu_danger" t-if="isCashier" t-on-click="() => this.menuAction('openCloseSession')"><i class="fa fa-lock"/> Fermer la caisse</button>
+                        <button class="adk_menu_item" t-on-click="backToConfigs"><i class="fa fa-sign-out"/> Quitter</button>
+                    </div>
+                </div>
+
+                <!-- ===== Pas de commande ouverte : onglets ===== -->
+                <t t-if="!state.order">
+                    <div class="adk_tabs">
+                        <button t-if="state.cfg.use_tables" t-attf-class="adk_tab #{state.tab === 'floor' ? 'active' : ''}" t-on-click="() => this.showTab('floor')">
+                            <i class="fa fa-th"/> Plan de salle
+                        </button>
+                        <button t-attf-class="adk_tab #{state.tab === 'tickets' ? 'active' : ''}" t-on-click="() => this.showTab('tickets')">
+                            <i class="fa fa-list"/> Commandes en cours
+                            <span class="adk_badge" t-if="state.queue.length" t-esc="state.queue.length"/>
+                        </button>
+                        <button t-if="state.cfg.use_tables and state.cfg.reservation_enabled" t-attf-class="adk_tab #{state.tab === 'reservations' ? 'active' : ''}" t-on-click="() => this.showTab('reservations')">
+                            <i class="fa fa-calendar"/> Réservations
+                        </button>
+                        <button t-attf-class="adk_tab #{state.tab === 'history' ? 'active' : ''}" t-on-click="() => this.showTab('history')">
+                            <i class="fa fa-history"/> Historique
+                        </button>
+                        <div class="adk_tab_spacer"/>
+                        <button class="adk_btn adk_btn_primary" t-on-click="startQuickSale">
+                            <i class="fa fa-bolt"/> Vente rapide
+                        </button>
+                    </div>
+
+                    <!-- PLAN DE SALLE -->
+                    <div t-if="state.tab === 'floor' and state.cfg.use_tables" class="adk_content">
+                        <div class="adk_floor_bar">
+                            <div class="adk_floor_tabs">
+                                <button t-foreach="state.floors" t-as="floor" t-key="floor.id"
+                                        t-attf-class="adk_chip #{floor.id === state.floorId ? 'active' : ''}"
+                                        t-on-click="() => this.selectFloor(floor)"
+                                        t-esc="floor.name"/>
+                            </div>
+                            <div class="adk_legend">
+                                <button t-if="state.cfg.reservation_enabled and !state.editMode" class="adk_btn adk_btn_small adk_btn_primary" t-on-click="newReservation"><i class="fa fa-calendar-plus-o"/> Réserver une table</button>
+                                <button t-if="isManager and !state.editMode" class="adk_btn adk_btn_small" t-on-click="toggleEditMode"><i class="fa fa-cog"/> Modifier le plan</button>
+                                <span><i class="adk_dot adk_dot_free"/> Libre</span>
+                                <span><i class="adk_dot adk_dot_occupied"/> Occupée</span>
+                                <span><i class="adk_dot adk_dot_billing"/> Addition</span>
+                                <span><i class="adk_dot adk_dot_reserved"/> Réservée</span>
+                            </div>
+                        </div>
+
+                        <!-- Barre d'édition du plan -->
+                        <div t-if="state.editMode" class="adk_edit_bar">
+                            <strong><i class="fa fa-pencil"/> Mode édition</strong>
+                            <button class="adk_btn adk_btn_small" t-on-click="addTable"><i class="fa fa-plus"/> Ajouter une table</button>
+                            <button class="adk_btn adk_btn_small" t-on-click="openGenTables"><i class="fa fa-magic"/> Générer des tables</button>
+                            <button class="adk_btn adk_btn_small" t-on-click="arrangeTables"><i class="fa fa-th"/> Ranger</button>
+                            <button class="adk_btn adk_btn_small" t-on-click="pickBackground"><i class="fa fa-picture-o"/> Image de fond</button>
+                            <button t-if="currentFloor and currentFloor.bg" class="adk_btn adk_btn_small" t-on-click="removeBackground"><i class="fa fa-ban"/> Retirer l'image</button>
+                            <button class="adk_btn adk_btn_small" t-on-click="openNewFloor"><i class="fa fa-plus-square-o"/> Nouvelle salle</button>
+                            <input type="file" accept="image/*" class="d-none" t-ref="bgInput" t-on-change="onBackgroundChosen"/>
+                            <t t-if="selectedTable">
+                                <button class="adk_btn adk_btn_small" t-on-click="renameSelectedTable"><i class="fa fa-i-cursor"/> <t t-esc="selectedTable.name"/></button>
+                                <span class="adk_edit_group">
+                                    <button class="adk_round_btn" t-on-click="() => this.changeTableSeats(-1)">−</button>
+                                    <span><t t-esc="selectedTable.seats"/> places</span>
+                                    <button class="adk_round_btn" t-on-click="() => this.changeTableSeats(1)">+</button>
+                                </span>
+                                <span class="adk_edit_group">
+                                    <button t-attf-class="adk_chip #{selectedTable.shape === 'square' ? 'active' : ''}" t-on-click="() => this.setTableShape('square')">▢</button>
+                                    <button t-attf-class="adk_chip #{selectedTable.shape === 'round' ? 'active' : ''}" t-on-click="() => this.setTableShape('round')">◯</button>
+                                    <button t-attf-class="adk_chip #{selectedTable.shape === 'rectangle' ? 'active' : ''}" t-on-click="() => this.setTableShape('rectangle')">▭</button>
+                                </span>
+                                <button class="adk_btn adk_btn_small adk_btn_danger" t-on-click="removeSelectedTable"><i class="fa fa-trash"/> Supprimer</button>
+                            </t>
+                            <div class="adk_tab_spacer"/>
+                            <button class="adk_btn adk_btn_ghost" t-on-click="cancelLayoutEdit">Annuler</button>
+                            <button class="adk_btn adk_btn_primary" t-on-click="() => this.saveLayout()"><i class="fa fa-check"/> Enregistrer</button>
+                        </div>
+
+                        <div class="adk_canvas_wrap">
+                            <div t-if="currentFloor" t-ref="canvas" class="adk_floor_canvas" t-att-style="canvasStyle"
+                                 t-on-click="() => this.clearSelection()">
+                                <div t-foreach="tablesOfFloor" t-as="table" t-key="table.id"
+                                     t-attf-class="adk_table adk_table_#{table.state} adk_shape_#{table.shape} #{state.selectedTableId === table.id ? 'selected' : ''} #{state.editMode ? 'editing' : ''}"
+                                     t-att-style="tableStyle(table)"
+                                     t-on-click.stop="() => this.onTableClick(table)"
+                                     t-on-pointerdown="(ev) => this.onTablePointerDown(ev, table, 'move')">
+                                    <div class="adk_table_name" t-esc="table.name"/>
+                                    <div class="adk_table_seats"><i class="fa fa-users"/> <t t-esc="table.seats"/></div>
+                                    <t t-if="table.state === 'occupied' or table.state === 'billing'">
+                                        <div class="adk_table_total" t-esc="formatMoney(table.total)"/>
+                                        <div class="adk_table_meta"><i class="fa fa-clock-o"/> <t t-esc="ageLabel(table.elapsed_min)"/></div>
+                                    </t>
+                                    <div t-if="table.state === 'reserved' and table.reservation_label" class="adk_table_meta" t-esc="table.reservation_label"/>
+                                    <div t-if="table.ready_count" class="adk_table_ready"><i class="fa fa-bell"/> <t t-esc="table.ready_count"/></div>
+                                    <div t-if="table.order_count > 1" class="adk_table_multi"><t t-esc="table.order_count"/> add.</div>
+                                    <div t-if="state.editMode and state.selectedTableId === table.id" class="adk_resize_handle"
+                                         t-on-pointerdown="(ev) => this.onTablePointerDown(ev, table, 'resize')"/>
+                                </div>
+                            </div>
+                            <div t-else="" class="adk_empty">
+                                Aucune salle configurée. Ajoutez une salle dans Configuration → Points de vente → Salles / Tables.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- COMMANDES EN COURS -->
+                    <div t-if="state.tab === 'tickets'" class="adk_content">
+                        <div class="adk_alert" t-if="kioskPending">
+                            <i class="fa fa-bell"/> <t t-esc="kioskPending"/> commande(s) client(s) (QR) à valider.
+                        </div>
+                        <div class="adk_order_grid">
+                            <div t-foreach="state.queue" t-as="o" t-key="o.id"
+                                 t-attf-class="adk_order_card adk_state_#{o.state}" t-on-click="() => this.openOrder(o.id)">
+                                <div class="adk_order_head">
+                                    <strong t-esc="o.name"/>
+                                    <span class="adk_pill" t-esc="stateLabel(o.state)"/>
+                                </div>
+                                <div t-if="o.table"><i class="fa fa-cutlery"/> Table <t t-esc="o.table"/></div>
+                                <div t-else=""><i class="fa fa-shopping-bag"/> <t t-esc="{dine_in: 'Sur place', takeaway: 'À emporter', delivery: 'Livraison'}[o.order_type]"/></div>
+                                <div class="adk_hint"><i class="fa fa-user"/> <t t-esc="o.server"/> · <t t-esc="ageLabel(o.age_min)"/></div>
+                                <div t-if="o.source === 'kiosk'" class="adk_pill adk_pill_orange">Commande client QR</div>
+                                <div class="adk_order_total" t-esc="formatMoney(o.amount_total)"/>
+                            </div>
+                            <div t-if="!state.queue.length" class="adk_empty">Aucune commande en cours.</div>
+                        </div>
+                        <div class="adk_row mt-3" t-if="!state.cfg.use_tables or state.cfg.allow_takeaway or state.cfg.allow_delivery">
+                            <button t-if="state.cfg.allow_takeaway" class="adk_btn adk_btn_ghost" t-on-click="() => this.startOrderWithoutTable('takeaway')"><i class="fa fa-shopping-bag"/> Nouvelle commande à emporter</button>
+                            <button t-if="state.cfg.allow_delivery" class="adk_btn adk_btn_ghost" t-on-click="() => this.startOrderWithoutTable('delivery')"><i class="fa fa-motorcycle"/> Nouvelle livraison</button>
+                        </div>
+                    </div>
+
+                    <!-- RÉSERVATIONS -->
+                    <div t-if="state.tab === 'reservations'" class="adk_content">
+                        <div class="adk_row mb-3">
+                            <h3 class="m-0">Réservations</h3>
+                            <div class="adk_tab_spacer"/>
+                            <button class="adk_btn adk_btn_primary" t-on-click="newReservation"><i class="fa fa-plus"/> Nouvelle réservation</button>
+                        </div>
+                        <div class="adk_res_list">
+                            <div t-foreach="state.reservations" t-as="res" t-key="res.id"
+                                 t-attf-class="adk_res_card #{res.state === 'seated' ? 'seated' : ''} #{res.minutes_until &lt; 0 and res.state === 'confirmed' ? 'late' : ''}">
+                                <div class="adk_res_time">
+                                    <div class="adk_res_hour" t-esc="res.time"/>
+                                    <div class="adk_hint" t-if="res.is_today">Aujourd'hui</div>
+                                    <div class="adk_hint" t-else="" t-esc="res.day_label"/>
+                                </div>
+                                <div class="adk_res_info">
+                                    <strong t-esc="res.customer"/>
+                                    <div><i class="fa fa-users"/> <t t-esc="res.guests"/> pers.
+                                        <t t-if="res.tables"> · <i class="fa fa-cutlery"/> <t t-esc="res.tables"/></t>
+                                        <t t-if="res.phone"> · <i class="fa fa-phone"/> <t t-esc="res.phone"/></t>
+                                    </div>
+                                    <div class="adk_hint" t-if="res.note" t-esc="res.note"/>
+                                    <div class="adk_hint" t-if="res.state === 'confirmed' and res.minutes_until >= 0">dans <t t-esc="ageLabel(res.minutes_until)"/></div>
+                                    <div class="adk_hint adk_text_red" t-if="res.state === 'confirmed' and res.minutes_until &lt; 0">en retard de <t t-esc="ageLabel(-res.minutes_until)"/></div>
+                                </div>
+                                <div class="adk_res_actions">
+                                    <t t-if="res.state === 'confirmed'">
+                                        <button class="adk_btn adk_btn_primary adk_btn_small" t-on-click="() => this.seatReservation(res)">Installer</button>
+                                        <button class="adk_btn adk_btn_ghost adk_btn_small" t-on-click="() => this.setReservationState(res, 'no_show')">Absent</button>
+                                        <button class="adk_btn adk_btn_ghost adk_btn_small" t-on-click="() => this.setReservationState(res, 'cancelled')">Annuler</button>
+                                    </t>
+                                    <t t-else="">
+                                        <button t-if="res.order_id" class="adk_btn adk_btn_ghost adk_btn_small" t-on-click="() => this.openOrder(res.order_id)">Voir la commande</button>
+                                    </t>
+                                </div>
+                            </div>
+                            <div t-if="!state.reservations.length" class="adk_empty">Aucune réservation à venir.</div>
+                        </div>
+                    </div>
+
+                    <!-- HISTORIQUE -->
+                    <div t-if="state.tab === 'history'" class="adk_content">
+                        <div class="adk_row mb-3">
+                            <input class="adk_input" type="text" placeholder="Rechercher (n° commande, table, client)…"
+                                   t-model="state.historySearch" t-on-input="onHistorySearch"/>
+                        </div>
+                        <div class="adk_order_grid">
+                            <div t-foreach="state.history" t-as="o" t-key="o.id"
+                                 t-attf-class="adk_order_card adk_state_paid #{o.is_refund ? 'adk_refund' : ''}" t-on-click="() => this.openOrder(o.id)">
+                                <div class="adk_order_head">
+                                    <strong t-esc="o.name"/>
+                                    <span class="adk_pill adk_pill_orange" t-if="o.is_refund">Remboursement</span>
+                                    <span class="adk_pill adk_pill_grey" t-elif="o.fully_refunded">Remboursée</span>
+                                </div>
+                                <div t-if="o.table"><i class="fa fa-cutlery"/> Table <t t-esc="o.table"/></div>
+                                <div class="adk_hint"><i class="fa fa-user"/> <t t-esc="o.server"/> · il y a <t t-esc="ageLabel(o.age_min)"/> · <t t-esc="o.method"/></div>
+                                <div class="adk_order_total" t-esc="formatMoney(o.amount_total)"/>
+                            </div>
+                            <div t-if="!state.history.length" class="adk_empty">Aucune commande payée récemment.</div>
+                        </div>
+                    </div>
+                </t>
+
+                <!-- ===== Commande ouverte : écran de prise de commande ===== -->
+                <t t-else="">
+                    <!-- Commande payée / annulée : lecture seule -->
+                    <div t-if="readonlyOrder" class="adk_order_screen adk_readonly">
+                        <div class="adk_panel adk_receipt_panel">
+                            <div class="adk_panel_head">
+                                <button class="adk_icon_btn" t-on-click="closeOrder"><i class="fa fa-arrow-left"/></button>
+                                <strong t-esc="state.order.name"/>
+                                <span t-attf-class="adk_pill adk_state_#{state.order.state}" t-esc="stateLabel(state.order.state)"/>
+                                <span class="adk_pill adk_pill_orange" t-if="state.order.is_refund">Remboursement de <t t-esc="state.order.refund_of"/></span>
+                            </div>
+                            <div class="adk_cart_lines">
+                                <div t-foreach="state.order.lines" t-as="line" t-key="line.id" class="adk_cart_line">
+                                    <div class="adk_cart_line_main">
+                                        <div class="adk_cart_line_name"><t t-esc="line.qty"/> × <t t-esc="line.name"/></div>
+                                        <div class="adk_hint" t-if="line.note" t-esc="line.note"/>
+                                        <div class="adk_hint" t-if="line.discount">Remise <t t-esc="line.discount"/> %</div>
+                                        <div class="adk_hint adk_text_orange" t-if="line.refunded_qty > 0 and line.qty > 0">Remboursé : <t t-esc="line.refunded_qty"/></div>
+                                    </div>
+                                    <div class="adk_cart_line_price" t-esc="formatMoney(line.price_total)"/>
+                                </div>
+                            </div>
+                            <div class="adk_totals">
+                                <div class="adk_total_row" t-if="state.order.amount_tax"><span>Taxes</span><span t-esc="formatMoney(state.order.amount_tax)"/></div>
+                                <div class="adk_total_row" t-if="state.order.tip_amount"><span>Pourboire</span><span t-esc="formatMoney(state.order.tip_amount)"/></div>
+                                <div class="adk_total_row adk_total_main"><span>Total</span><span t-esc="formatMoney(state.order.amount_total + state.order.tip_amount)"/></div>
+                                <div class="adk_total_row" t-foreach="state.order.payments" t-as="p" t-key="p.id">
+                                    <span><t t-esc="p.method"/><t t-if="p.reference"> (<t t-esc="p.reference"/>)</t></span>
+                                    <span t-esc="formatMoney(p.amount)"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="adk_panel adk_actions_panel">
+                            <button class="adk_btn adk_btn_big" t-on-click="() => this.printReceipt()"><i class="fa fa-print"/> Imprimer le ticket</button>
+                            <button class="adk_btn adk_btn_big adk_btn_ghost" t-on-click="() => this.printBasicReceipt()"><i class="fa fa-gift"/> Ticket cadeau (sans prix)</button>
+                            <button class="adk_btn adk_btn_big adk_btn_ghost" t-on-click="() => this.downloadReceiptPdf()"><i class="fa fa-file-pdf-o"/> Ticket PDF</button>
+                            <button t-if="isCashier and state.order.state === 'paid' and !state.order.is_refund"
+                                    class="adk_btn adk_btn_big adk_btn_warning" t-on-click="openRefund">
+                                <i class="fa fa-undo"/> Rembourser
+                            </button>
+                            <button class="adk_btn adk_btn_big adk_btn_ghost" t-on-click="closeOrder">Fermer</button>
+                        </div>
+                    </div>
+
+                    <!-- Commande en cours de saisie -->
+                    <div t-else="" class="adk_order_screen">
+                        <!-- Catalogue -->
+                        <div class="adk_panel adk_catalog_panel">
+                            <div class="adk_catalog_top">
+                                <button class="adk_icon_btn" t-on-click="closeOrder"><i class="fa fa-arrow-left"/></button>
+                                <div class="adk_search">
+                                    <i class="fa fa-search"/>
+                                    <input type="text" placeholder="Rechercher ou scanner un code-barres…"
+                                           t-model="state.search" t-on-keydown="onSearchKeydown"/>
+                                </div>
+                            </div>
+                            <div class="adk_categ_tabs">
+                                <button t-if="hasFavorites" t-attf-class="adk_chip #{state.categoryId === 'fav' ? 'active' : ''}" t-on-click="() => this.setCategory('fav')">★ Favoris</button>
+                                <button t-attf-class="adk_chip #{state.categoryId === 'all' ? 'active' : ''}" t-on-click="() => this.setCategory('all')">Tous</button>
+                                <button t-foreach="state.categories" t-as="categ" t-key="categ.id"
+                                        t-attf-class="adk_chip #{state.categoryId === categ.id ? 'active' : ''}"
+                                        t-on-click="() => this.setCategory(categ.id)" t-esc="categ.name"/>
+                            </div>
+                            <div class="adk_product_grid">
+                                <div t-foreach="filteredProducts" t-as="product" t-key="product.id"
+                                     class="adk_product_card" t-on-click="() => this.addProduct(product)">
+                                    <img t-if="product.adk_pos_has_image and !state.cfg.hide_images" t-attf-src="/web/image/product.product/#{product.id}/image_256" alt=""/>
+                                    <div t-else="" t-attf-class="adk_product_ph #{phClass(product)}" t-esc="(product.name || '?').charAt(0).toUpperCase()"/>
+                                    <div class="adk_product_name" t-esc="product.name"/>
+                                    <div class="adk_product_price" t-esc="formatMoney(product.lst_price)"/>
+                                    <span class="adk_product_qty" t-if="cartQtyFor(product.id)" t-esc="cartQtyFor(product.id)"/>
+                                </div>
+                                <div t-if="!filteredProducts.length" class="adk_empty">Aucun produit.</div>
+                            </div>
+                        </div>
+
+                        <!-- Panier -->
+                        <div class="adk_panel adk_cart_panel">
+                            <div class="adk_panel_head">
+                                <div>
+                                    <strong t-esc="state.order.name"/>
+                                    <div class="adk_hint">
+                                        <t t-if="state.order.table_id"><i class="fa fa-cutlery"/> Table <t t-esc="state.order.table_id[1]"/> · </t>
+                                        <t t-esc="{dine_in: 'Sur place', takeaway: 'À emporter', delivery: 'Livraison'}[state.order.order_type]"/>
+                                        · <t t-esc="state.order.guests"/> couv.
+                                    </div>
+                                </div>
+                                <span t-attf-class="adk_pill adk_state_#{state.order.state}" t-esc="stateLabel(state.order.state)"/>
+                            </div>
+                            <div class="adk_chip_row">
+                                <button class="adk_chip" t-on-click="openClientModal">
+                                    <i class="fa fa-user"/> <t t-esc="state.order.partner_id ? state.order.partner_id[1] : 'Client'"/>
+                                </button>
+                                <button class="adk_chip" t-if="state.cfg.use_tables and !orderLocked" t-on-click="openGuests"><i class="fa fa-users"/> Couverts</button>
+                                <button class="adk_chip" t-if="!orderLocked" t-on-click="openOrderNote"><i class="fa fa-pencil"/> Note</button>
+                                <button class="adk_chip" t-if="!orderLocked" t-on-click="openOrderType"><i class="fa fa-exchange"/> Type</button>
+                                <span class="adk_pill" t-if="state.order.invoice"><i class="fa fa-file-text-o"/> <t t-esc="state.order.invoice"/> · <t t-esc="{not_paid: 'Non payée', partial: 'Partielle', paid: 'Payée', in_payment: 'Payée', reversed: 'Annulée'}[state.order.invoice_state] || ''"/></span>
+                                <button class="adk_chip" t-if="state.cfg.global_discount_enabled and !orderLocked" t-on-click="openGlobalDiscount"><i class="fa fa-percent"/> Remise</button>
+                                <button class="adk_chip" t-on-click="() => this.openModal('actions')"><i class="fa fa-ellipsis-h"/> Actions</button>
+                            </div>
+                            <div class="adk_alert adk_alert_note" t-if="state.order.note"><i class="fa fa-sticky-note-o"/> <t t-esc="state.order.note"/></div>
+
+                            <div class="adk_cart_lines">
+                                <div t-foreach="cartLines" t-as="line" t-key="line.id" class="adk_cart_line">
+                                    <div class="adk_cart_line_main" t-on-click="() => this.openLineEdit(line)">
+                                        <div class="adk_cart_line_name">
+                                            <t t-esc="line.name"/>
+                                            <span class="adk_tag adk_tag_sent" t-if="line.qty_sent >= line.qty">✓ envoyé</span>
+                                            <span class="adk_tag adk_tag_new" t-elif="line.qty_sent > 0">+<t t-esc="line.qty - line.qty_sent"/> nouveau</span>
+                                        </div>
+                                        <div class="adk_hint" t-if="line.note"><i class="fa fa-comment-o"/> <t t-esc="line.note"/></div>
+                                        <div class="adk_hint" t-if="line.discount">Remise <t t-esc="line.discount"/> %</div>
+                                        <div class="adk_hint" t-if="state.cfg.use_tables and !['retail', 'boutique'].includes(state.cfg.pos_type) and line.course !== 'other'"><t t-esc="courseLabel(line.course)"/></div>
+                                    </div>
+                                    <div class="adk_qty_ctrl">
+                                        <button class="adk_round_btn" t-on-click="() => this.changeQty(line, -1)">−</button>
+                                        <span t-esc="line.qty"/>
+                                        <button class="adk_round_btn" t-on-click="() => this.changeQty(line, 1)">+</button>
+                                    </div>
+                                    <div class="adk_cart_line_price" t-esc="formatMoney(line.price_total)"/>
+                                </div>
+                                <div t-if="!state.order.lines.length" class="adk_empty">Touchez un produit pour l'ajouter.</div>
+                            </div>
+
+                            <div class="adk_totals">
+                                <div class="adk_total_row" t-if="state.order.amount_tax"><span>Sous-total HT</span><span t-esc="formatMoney(state.order.amount_untaxed)"/></div>
+                                <div class="adk_total_row" t-if="state.order.amount_tax"><span>Taxes</span><span t-esc="formatMoney(state.order.amount_tax)"/></div>
+                                <div class="adk_total_row" t-if="state.order.discount_total"><span>Remises</span><span t-esc="formatMoney(state.order.discount_total)"/></div>
+                                <div class="adk_total_row" t-if="state.order.amount_paid"><span>Déjà payé</span><span t-esc="formatMoney(state.order.amount_paid)"/></div>
+                                <div class="adk_total_row adk_total_main"><span>Total</span><span t-esc="formatMoney(state.order.amount_total)"/></div>
+                            </div>
+
+                            <div class="adk_cart_actions">
+                                <button t-if="!['retail', 'boutique'].includes(state.cfg.pos_type)" class="adk_btn adk_btn_big adk_btn_orange"
+                                        t-att-disabled="!state.order.has_unsent or state.busy" t-on-click="sendOrder">
+                                    <i class="fa fa-fire"/> Envoyer en préparation
+                                </button>
+                                <button t-if="isCashier" class="adk_btn adk_btn_big adk_btn_green"
+                                        t-att-disabled="!state.order.lines.length" t-on-click="openPayment">
+                                    <i class="fa fa-money"/> Encaisser <t t-esc="formatMoney(state.order.amount_due)"/>
+                                </button>
+                                <button t-else="" class="adk_btn adk_btn_big adk_btn_green"
+                                        t-att-disabled="!state.order.lines.length" t-on-click="requestBill">
+                                    <i class="fa fa-file-text-o"/> Demander l'addition
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </div>
+
+            <!-- ====== PAIEMENT (plein écran) ====== -->
+            <div t-if="state.pay.open and state.order" class="adk_overlay adk_pay_overlay">
+                <div class="adk_pay_screen">
+                    <t t-if="state.pay.result and state.pay.result.paid">
+                        <div class="adk_pay_success">
+                            <i class="fa fa-check-circle fa-4x"/>
+                            <h1>Paiement validé</h1>
+                            <div class="adk_big_amount" t-esc="formatMoney(state.order.amount_total + state.order.tip_amount)"/>
+                            <div t-if="state.order.invoice" class="adk_hint">
+                                Facture <strong t-esc="state.order.invoice"/> ·
+                                <t t-esc="{not_paid: 'NON PAYÉE (crédit)', partial: 'Partiellement payée', paid: 'Payée', in_payment: 'Payée', reversed: 'Annulée'}[state.order.invoice_state] || ''"/>
+                            </div>
+                            <div t-if="state.pay.result.change > 0" class="adk_change_box">
+                                Monnaie à rendre : <strong t-esc="formatMoney(state.pay.result.change)"/>
+                            </div>
+                            <div class="adk_row mt-4">
+                                <button class="adk_btn adk_btn_big adk_btn_ghost" t-on-click="() => this.printReceipt()"><i class="fa fa-print"/> Ticket</button>
+                                <button class="adk_btn adk_btn_big adk_btn_primary" t-on-click="finishPayment">Nouvelle commande</button>
+                            </div>
+                        </div>
+                    </t>
+                    <t t-else="">
+                        <div class="adk_pay_head">
+                            <button class="adk_icon_btn" t-on-click="closePayment"><i class="fa fa-arrow-left"/></button>
+                            <strong>Paiement — <t t-esc="state.order.name"/></strong>
+                            <span class="adk_tab_spacer"/>
+                            <span class="adk_pay_due">Reste à payer : <strong t-esc="formatMoney(payRemaining)"/></span>
+                        </div>
+                        <div class="adk_pay_body">
+                            <!-- Colonne 1 : modes de paiement et lignes -->
+                            <div class="adk_pay_col">
+                                <button class="adk_chip mb-2" t-on-click="openClientModal">
+                                    <i class="fa fa-user"/> <t t-esc="state.order.partner_id ? state.order.partner_id[1] : 'Client (facultatif — facture)'"/>
+                                </button>
+                                <div class="adk_hint mb-2">Choisissez un mode de paiement</div>
+                                <div class="adk_method_grid">
+                                    <button t-foreach="state.cfg.payment_methods" t-as="method" t-key="method.id"
+                                            class="adk_method_btn" t-on-click="() => this.addPaymentLine(method)">
+                                        <i t-attf-class="fa fa-#{method.icon}"/>
+                                        <span t-esc="method.name"/>
+                                    </button>
+                                </div>
+                                <div class="adk_pay_lines">
+                                    <div t-foreach="state.pay.lines" t-as="pl" t-key="pl.uid"
+                                         t-attf-class="adk_pay_line #{state.pay.selected === pl_index ? 'selected' : ''}"
+                                         t-on-click="() => this.selectPaymentLine(pl_index)">
+                                        <div class="adk_pay_line_head">
+                                            <strong t-esc="pl.name"/>
+                                            <span class="adk_pay_line_amount" t-esc="formatMoney(pl.amount)"/>
+                                            <button class="adk_icon_btn" t-on-click.stop="() => this.removePaymentLine(pl_index)"><i class="fa fa-trash"/></button>
+                                        </div>
+                                        <button t-if="pl.terminal" t-attf-class="adk_btn adk_btn_small #{pl.terminal_status === 'ok' ? 'adk_btn_green' : 'adk_btn_primary'} mb-2"
+                                                t-att-disabled="state.busy" t-on-click.stop="() => this.chargeTerminal(pl_index)">
+                                            <i t-attf-class="fa #{pl.terminal_status === 'ok' ? 'fa-check' : 'fa-wifi'}"/>
+                                            <t t-if="pl.terminal_status === 'ok'"> Confirmé par le terminal</t><t t-else=""> Envoyer au terminal</t>
+                                        </button>
+                                        <input t-if="pl.requires_reference or !pl.is_cash" type="text" class="adk_input"
+                                               t-att-placeholder="pl.requires_reference ? 'Référence (obligatoire)' : 'Référence (facultatif)'"
+                                               t-model="pl.reference" t-on-click.stop="() => this.noop()"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Colonne 2 : montants -->
+                            <div class="adk_pay_col">
+                                <div class="adk_pay_summary">
+                                    <div class="adk_total_row"><span>Total commande</span><span t-esc="formatMoney(state.order.amount_total)"/></div>
+                                    <div class="adk_total_row" t-if="state.order.amount_paid"><span>Déjà payé</span><span t-esc="formatMoney(state.order.amount_paid)"/></div>
+                                    <t t-if="state.cfg.tip_enabled">
+                                        <div class="adk_total_row"><span>Pourboire</span>
+                                            <input type="text" inputmode="decimal" class="adk_input adk_input_small" t-model="state.pay.tip" placeholder="0"/>
+                                        </div>
+                                        <div class="adk_chip_row">
+                                            <button class="adk_chip" t-on-click="() => this.setTipPercent(5)">5 %</button>
+                                            <button class="adk_chip" t-on-click="() => this.setTipPercent(10)">10 %</button>
+                                            <button class="adk_chip" t-on-click="() => this.setTipPercent(15)">15 %</button>
+                                            <button class="adk_chip" t-on-click="() => this.setTipPercent(0)">0</button>
+                                        </div>
+                                    </t>
+                                    <div class="adk_total_row adk_total_main"><span>À payer</span><span t-esc="formatMoney(payDue)"/></div>
+                                    <div class="adk_total_row"><span>Saisi</span><span t-esc="formatMoney(payTotalEntered)"/></div>
+                                    <div class="adk_total_row adk_change_row" t-if="payChange > 0"><span>Monnaie à rendre</span><span t-esc="formatMoney(payChange)"/></div>
+                                </div>
+                                <button class="adk_btn adk_btn_big adk_btn_green mt-3" t-att-disabled="state.busy or !payTotalEntered" t-on-click="confirmPayment">
+                                    <i class="fa fa-check"/> Valider le paiement
+                                </button>
+                            </div>
+                            <!-- Colonne 3 : pavé -->
+                            <div class="adk_pay_col">
+                                <t t-if="state.pay.selected !== null">
+                                    <t t-set="npFn" t-value="(k) => this.payKey(k)"/>
+                                    <t t-set="npDot" t-value="true"/>
+                                    <t t-call="adk_pos.Numpad"/>
+                                    <div class="adk_chip_row mt-2">
+                                        <button class="adk_chip" t-on-click="setExactAmount">Exact</button>
+                                        <button t-foreach="state.cfg.denominations.slice(0, 4)" t-as="d" t-key="d" class="adk_chip" t-on-click="() => this.payKey('+' + d)">
+                                            +<t t-esc="d"/>
+                                        </button>
+                                    </div>
+                                </t>
+                                <div t-else="" class="adk_empty">Sélectionnez un mode de paiement pour saisir un montant.</div>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+            </div>
+
+            <!-- ====== VALIDATION MANAGER (PIN) ====== -->
+            <div t-if="state.approval" class="adk_overlay adk_overlay_top">
+                <div class="adk_modal adk_modal_small">
+                    <h3><i class="fa fa-shield"/> Validation manager</h3>
+                    <p t-esc="state.approval.label"/>
+                    <select class="adk_input" t-model="state.approval.managerId">
+                        <option t-foreach="state.approval.managers" t-as="mg" t-key="mg.id" t-att-value="mg.id" t-esc="mg.name"/>
+                    </select>
+                    <div class="adk_pin_dots">
+                        <span t-foreach="[0,1,2,3,4,5]" t-as="i" t-key="i"
+                              t-attf-class="adk_pin_dot #{i &lt; state.approval.pin.length ? 'filled' : ''}"/>
+                    </div>
+                    <div class="adk_pin_error" t-if="state.approval.error" t-esc="state.approval.error"/>
+                    <t t-set="npFn" t-value="(k) => this.approvalKey(k)"/>
+                    <t t-set="npDot" t-value="false"/>
+                    <t t-call="adk_pos.Numpad"/>
+                    <div class="adk_row mt-3">
+                        <button class="adk_btn adk_btn_ghost" t-on-click="cancelApproval">Annuler</button>
+                        <button class="adk_btn adk_btn_primary" t-on-click="confirmApproval">Valider</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ====== FENÊTRES MODALES ====== -->
+            <div t-if="state.modal" class="adk_overlay" t-on-click="closeModal">
+                <div class="adk_modal" t-on-click.stop="() => this.noop()">
+
+                    <!-- Plusieurs additions sur une table -->
+                    <t t-if="state.modal === 'tableOrders'">
+                        <h3>Table <t t-esc="state.m.table.name"/> — plusieurs additions</h3>
+                        <div class="adk_list">
+                            <button t-foreach="state.m.table.order_ids" t-as="oid" t-key="oid" class="adk_list_item"
+                                    t-on-click="() => this.openOrderFromModal(oid)">
+                                Addition n°<t t-esc="oid_index + 1"/>
+                            </button>
+                        </div>
+                        <button class="adk_btn adk_btn_primary mt-3" t-on-click="() => this.startOrderOnTable(state.m.table, true)"><i class="fa fa-plus"/> Nouvelle addition sur cette table</button>
+                    </t>
+
+                    <!-- Table réservée -->
+                    <t t-elif="state.modal === 'reservedTable'">
+                        <h3>Table <t t-esc="state.m.table.name"/> réservée</h3>
+                        <p t-esc="state.m.table.reservation_label"/>
+                        <div class="adk_row">
+                            <button class="adk_btn adk_btn_primary" t-on-click="() => this.startOrderOnTable(state.m.table)">Ouvrir quand même</button>
+                            <button t-if="state.m.table.is_reserved" class="adk_btn adk_btn_ghost" t-on-click="() => this.freeReservedTable(state.m.table)">Libérer la table</button>
+                            <button class="adk_btn adk_btn_ghost" t-on-click="closeModal">Fermer</button>
+                        </div>
+                    </t>
+
+                    <t t-elif="state.modal === 'genTables'">
+                        <h3>Générer des tables</h3>
+                        <div class="adk_field"><label>Nombre de tables</label><input class="adk_input" type="number" min="1" max="150" t-model="state.m.count"/></div>
+                        <div class="adk_field"><label>Places par table</label><input class="adk_input" type="number" min="1" max="30" t-model="state.m.seats"/></div>
+                        <div class="adk_field"><label>Forme</label>
+                            <div class="adk_row">
+                                <button t-attf-class="adk_chip #{state.m.shape === 'square' ? 'active' : ''}" t-on-click="() => state.m.shape = 'square'">▢ Carrée</button>
+                                <button t-attf-class="adk_chip #{state.m.shape === 'round' ? 'active' : ''}" t-on-click="() => state.m.shape = 'round'">◯ Ronde</button>
+                                <button t-attf-class="adk_chip #{state.m.shape === 'rectangle' ? 'active' : ''}" t-on-click="() => state.m.shape = 'rectangle'">▭ Rectangle</button>
+                            </div>
+                        </div>
+                        <label class="adk_check mt-2"><input type="checkbox" t-model="state.m.replace"/> Remplacer les tables existantes de cette salle</label>
+                        <p class="adk_hint">Les tables sont numérotées et rangées automatiquement. Glissez-les ensuite à leur place.</p>
+                        <div class="adk_row mt-3">
+                            <button class="adk_btn adk_btn_ghost" t-on-click="closeModal">Annuler</button>
+                            <button class="adk_btn adk_btn_primary" t-on-click="confirmGenTables">Générer</button>
+                        </div>
+                    </t>
+
+                    <t t-elif="state.modal === 'newFloor'">
+                        <h3>Nouvelle salle</h3>
+                        <input class="adk_input" type="text" t-model="state.m.name" placeholder="Terrasse, Salle VIP, Étage…" maxlength="40"/>
+                        <div class="adk_row mt-3">
+                            <button class="adk_btn adk_btn_ghost" t-on-click="closeModal">Annuler</button>
+                            <button class="adk_btn adk_btn_primary" t-on-click="confirmNewFloor">Créer</button>
+                        </div>
+                    </t>
+
+                    <t t-elif="state.modal === 'renameTable'">
+                        <h3>Nom de la table</h3>
+                        <input class="adk_input" type="text" t-model="state.m.name" maxlength="12"/>
+                        <div class="adk_row mt-3">
+                            <button class="adk_btn adk_btn_ghost" t-on-click="closeModal">Annuler</button>
+                            <button class="adk_btn adk_btn_primary" t-on-click="confirmRenameTable">OK</button>
+                        </div>
+                    </t>
+
+                    <!-- Nouvelle réservation -->
+                    <t t-elif="state.modal === 'reservation'">
+                        <h3><i class="fa fa-calendar"/> Nouvelle réservation</h3>
+                        <div class="adk_form_grid">
+                            <div class="adk_field"><label>Nom du client</label><input type="text" t-model="state.m.customer_name"/></div>
+                            <div class="adk_field"><label>Téléphone</label><input type="tel" t-model="state.m.phone"/></div>
+                            <div class="adk_field"><label>Date</label><input type="date" t-model="state.m.date" t-on-change="loadAvailability"/></div>
+                            <div class="adk_field"><label>Heure</label><input type="time" t-model="state.m.time" t-on-change="loadAvailability"/></div>
+                            <div class="adk_field"><label>Personnes</label>
+                                <div class="adk_qty_ctrl">
+                                    <button class="adk_round_btn" t-on-click="() => this.changeGuests(-1)">−</button>
+                                    <span t-esc="state.m.guests"/>
+                                    <button class="adk_round_btn" t-on-click="() => this.changeGuests(1)">+</button>
+                                </div>
+                            </div>
+                            <div class="adk_field"><label>Durée (min)</label><input type="number" min="15" step="15" t-model.number="state.m.duration" t-on-change="loadAvailability"/></div>
+                        </div>
+                        <div class="adk_field"><label>Tables (facultatif — plusieurs possibles)</label>
+                            <div class="adk_chip_row">
+                                <button t-foreach="state.m.tables" t-as="tb" t-key="tb.id"
+                                        t-attf-class="adk_chip #{state.m.table_ids.includes(tb.id) ? 'active' : ''} #{tb.available ? '' : 'adk_disabled'}"
+                                        t-on-click="() => this.toggleReservationTable(tb)">
+                                    <t t-esc="tb.name"/> (<t t-esc="tb.seats"/>)<t t-if="!tb.available"> ✕</t>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="adk_field"><label>Note</label><input type="text" t-model="state.m.note" placeholder="Anniversaire, allergie…"/></div>
+                        <div class="adk_row">
+                            <button class="adk_btn adk_btn_ghost" t-on-click="closeModal">Annuler</button>
+                            <button class="adk_btn adk_btn_primary" t-on-click="saveReservation">Enregistrer</button>
+                        </div>
+                    </t>
+
+                    <!-- Choix d'une table pour installer une réservation -->
+                    <t t-elif="state.modal === 'seatChoose'">
+                        <h3>Installer <t t-esc="state.m.res.customer"/> à quelle table ?</h3>
+                        <div class="adk_chip_row">
+                            <button t-foreach="state.m.tables" t-as="tb" t-key="tb.id" class="adk_chip" t-on-click="() => this.doSeat(state.m.res, tb.id)">
+                                <t t-esc="tb.name"/> (<t t-esc="tb.seats"/> places)
+                            </button>
+                        </div>
+                        <div class="adk_empty" t-if="!state.m.tables.length">Aucune table libre.</div>
+                        <button class="adk_btn adk_btn_ghost mt-3" t-on-click="closeModal">Annuler</button>
+                    </t>
+
+                    <!-- Modification d'une ligne -->
+                    <t t-elif="state.modal === 'lineEdit'">
+                        <h3 t-esc="state.m.line.name"/>
+                        <div class="adk_edit_cols">
+                            <div>
+                                <div class="adk_row">
+                                    <button t-attf-class="adk_chip #{state.m.field === 'qty' ? 'active' : ''}" t-on-click="() => this.setLineEditField('qty')">Quantité : <t t-esc="state.m.qty"/></button>
+                                    <button t-if="state.cfg.line_discount_enabled" t-attf-class="adk_chip #{state.m.field === 'discount' ? 'active' : ''}" t-on-click="() => this.setLineEditField('discount')">Remise % : <t t-esc="state.m.discount || 0"/></button>
+                                </div>
+                                <t t-set="npFn" t-value="(k) => this.lineEditKey(k)"/>
+                                <t t-set="npDot" t-value="true"/>
+                                <t t-call="adk_pos.Numpad"/>
+                            </div>
+                            <div>
+                                <div class="adk_hint mb-2" t-if="state.cfg.show_margins and isManager">Coût : <t t-esc="formatMoney(state.m.line.cost)"/> · Marge : <t t-esc="formatMoney(state.m.line.margin)"/></div>
+                                <div class="adk_field"><label>Note pour la cuisine</label><input type="text" t-model="state.m.note"/></div>
+                                <div class="adk_chip_row">
+                                    <button t-foreach="state.cfg.quick_notes" t-as="qn" t-key="qn" class="adk_chip" t-on-click="() => this.addQuickNote(qn)" t-esc="qn"/>
+                                </div>
+                                <t t-if="state.cfg.use_tables">
+                                    <div class="adk_hint mt-2">Service</div>
+                                    <div class="adk_chip_row">
+                                        <button t-foreach="courses" t-as="cs" t-key="cs.id"
+                                                t-attf-class="adk_chip #{state.m.course === cs.id ? 'active' : ''}"
+                                                t-on-click="() => this.setM('course', cs.id)" t-esc="cs.label"/>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                        <div class="adk_row mt-3">
+                            <button class="adk_btn adk_btn_danger" t-on-click="deleteLine"><i class="fa fa-trash"/> Supprimer</button>
+                            <div class="adk_tab_spacer"/>
+                            <button class="adk_btn adk_btn_ghost" t-on-click="closeModal">Annuler</button>
+                            <button class="adk_btn adk_btn_primary" t-on-click="saveLineEdit">OK</button>
+                        </div>
+                    </t>
+
+                    <t t-elif="state.modal === 'globalDiscount'">
+                        <h3>Remise sur toute la commande</h3>
+                        <div class="adk_big_amount"><t t-esc="state.m.percent || 0"/> %</div>
+                        <t t-set="npFn" t-value="(k) => this.numpadKey('m.percent', k)"/>
+                        <t t-set="npDot" t-value="true"/>
+                        <t t-call="adk_pos.Numpad"/>
+                        <div class="adk_chip_row mt-2">
+                            <button t-foreach="[5, 10, 15, 20, 50]" t-as="p" t-key="p" class="adk_chip" t-on-click="() => this.setM('percent', String(p))"><t t-esc="p"/> %</button>
+                        </div>
+                        <div class="adk_row mt-3">
+                            <button class="adk_btn adk_btn_ghost" t-on-click="closeModal">Annuler</button>
+                            <button class="adk_btn adk_btn_primary" t-on-click="applyGlobalDiscount">Appliquer</button>
+                        </div>
+                    </t>
+
+                    <t t-elif="state.modal === 'guests'">
+                        <h3><i class="fa fa-users"/> Nombre de convives<t t-if="state.m.pendingTable"> — Table <t t-esc="state.m.pendingTable.name"/></t></h3>
+                        <div class="adk_hint" t-if="state.m.pendingTable">Combien de personnes à cette table ? (<t t-esc="state.m.pendingTable.seats"/> places)</div>
+                        <div class="adk_chip_row">
+                            <button t-foreach="[1,2,3,4,5,6,8,10]" t-as="n" t-key="n" t-attf-class="adk_chip #{state.m.guests == n ? 'active' : ''}" t-on-click="() => state.m.guests = String(n)" t-esc="n"/>
+                        </div>
+                        <div class="adk_big_amount" t-esc="state.m.guests || 0"/>
+                        <t t-set="npFn" t-value="(k) => this.numpadKey('m.guests', k)"/>
+                        <t t-set="npDot" t-value="false"/>
+                        <t t-call="adk_pos.Numpad"/>
+                        <div class="adk_row mt-3">
+                            <button class="adk_btn adk_btn_ghost" t-on-click="closeModal">Annuler</button>
+                            <button class="adk_btn adk_btn_primary" t-on-click="saveGuests"><t t-if="state.m.pendingTable">Ouvrir la commande</t><t t-else="">OK</t></button>
+                        </div>
+                    </t>
+
+                    <t t-elif="state.modal === 'orderNote'">
+                        <h3>Note de la commande</h3>
+                        <textarea class="adk_input" rows="3" t-model="state.m.note"/>
+                        <div class="adk_chip_row mt-2">
+                            <button t-foreach="state.cfg.quick_notes" t-as="qn" t-key="qn" class="adk_chip" t-on-click="() => this.addQuickNote(qn)" t-esc="qn"/>
+                        </div>
+                        <div class="adk_row mt-3">
+                            <button class="adk_btn adk_btn_ghost" t-on-click="closeModal">Annuler</button>
+                            <button class="adk_btn adk_btn_primary" t-on-click="saveOrderNote">OK</button>
+                        </div>
+                    </t>
+
+                    <t t-elif="state.modal === 'orderType'">
+                        <h3>Type de commande</h3>
+                        <div class="adk_chip_row">
+                            <button t-foreach="orderTypes" t-as="ot" t-key="ot.id"
+                                    t-attf-class="adk_chip #{state.m.type === ot.id ? 'active' : ''}"
+                                    t-on-click="() => this.setM('type', ot.id)">
+                                <i t-attf-class="fa #{ot.icon}"/> <t t-esc="ot.label"/>
+                            </button>
+                        </div>
+                        <div class="adk_field mt-2"><label>Téléphone du client</label><input type="tel" t-model="state.m.phone"/></div>
+                        <div class="adk_field" t-if="state.m.type === 'delivery'"><label>Adresse de livraison</label><input type="text" t-model="state.m.address"/></div>
+                        <div class="adk_row mt-3">
+                            <button class="adk_btn adk_btn_ghost" t-on-click="closeModal">Annuler</button>
+                            <button class="adk_btn adk_btn_primary" t-on-click="saveOrderType">OK</button>
+                        </div>
+                    </t>
+
+                    <t t-elif="state.modal === 'client'">
+                        <h3><i class="fa fa-user"/> Client</h3>
+                        <p class="adk_hint" t-if="orderLocked">Commande validée : le client peut encore être renseigné, la facture est mise à jour.</p>
+                        <p class="adk_hint" t-elif="!state.order.partner_id">Sans client, la facture est établie au « Client divers ».</p>
+                        <input class="adk_input" type="text" placeholder="Rechercher un client (nom, téléphone, email)…" t-model="state.m.text" t-on-input="searchClients"/>
+                        <div class="adk_list mt-2" style="max-height:260px;overflow:auto;">
+                            <button t-foreach="state.m.results" t-as="pr" t-key="pr.id" class="adk_list_item" t-on-click="() => this.selectClient(pr)">
+                                <t t-esc="pr.name"/> <span class="adk_hint" t-if="pr.phone" t-esc="pr.phone"/>
+                            </button>
+                            <div class="adk_hint" t-if="!state.m.results.length">Aucun client trouvé.</div>
+                        </div>
+                        <div class="adk_row mt-2" t-if="state.m.text">
+                            <input class="adk_input" type="text" placeholder="Téléphone (facultatif)" t-model="state.m.phone"/>
+                            <button class="adk_btn adk_btn_small adk_btn_primary" t-on-click="createClient"><i class="fa fa-plus"/> Créer « <t t-esc="state.m.text"/> »</button>
+                        </div>
+                        <div class="adk_row mt-3">
+                            <button t-if="state.order.partner_id and !orderLocked" class="adk_btn adk_btn_ghost" t-on-click="clearClient">Retirer le client</button>
+                            <button class="adk_btn adk_btn_ghost" t-on-click="closeModal">Fermer</button>
+                        </div>
+                    </t>
+
+                    <t t-elif="state.modal === 'actions'">
+                        <h3>Actions sur la commande</h3>
+                        <div class="adk_action_grid">
+                            <button t-if="state.cfg.use_tables" class="adk_action_card" t-on-click="openTransfer"><i class="fa fa-arrows"/> Changer / fusionner de table</button>
+                            <button class="adk_action_card" t-if="state.cfg.allow_split" t-on-click="openSplit"><i class="fa fa-scissors"/> Séparer l'addition</button>
+                            <button class="adk_action_card" t-if="state.cfg.allow_bill_print" t-on-click="printBill"><i class="fa fa-file-text-o"/> Imprimer l'addition</button>
+                            <button t-if="state.order.send_count" class="adk_action_card" t-on-click="printKitchenAgain"><i class="fa fa-print"/> Réimprimer le bon cuisine</button>
+                            <button class="adk_action_card adk_action_danger" t-on-click="openCancelOrder"><i class="fa fa-times-circle"/> Annuler la commande</button>
+                        </div>
+                        <button class="adk_btn adk_btn_ghost mt-3" t-on-click="closeModal">Fermer</button>
+                    </t>
+
+                    <t t-elif="state.modal === 'cancelOrder'">
+                        <h3>Annuler la commande ?</h3>
+                        <div class="adk_field"><label>Motif</label><input type="text" t-model="state.m.reason" placeholder="Client parti, erreur de saisie…"/></div>
+                        <div class="adk_row mt-3">
+                            <button class="adk_btn adk_btn_ghost" t-on-click="closeModal">Non</button>
+                            <button class="adk_btn adk_btn_danger" t-on-click="confirmCancelOrder">Oui, annuler</button>
+                        </div>
+                    </t>
+
+                    <!-- Transfert de table -->
+                    <t t-elif="state.modal === 'transfer'">
+                        <h3>Déplacer vers une table</h3>
+                        <p class="adk_hint">Si la table est déjà occupée, les additions seront fusionnées.</p>
+                        <div class="adk_chip_row">
+                            <button t-foreach="transferTables" t-as="tb" t-key="tb.id"
+                                    t-attf-class="adk_chip adk_chip_#{tb.state}" t-on-click="() => this.doTransfer(tb)">
+                                <t t-esc="tb.name"/> <small t-if="tb.state !== 'free'">(<t t-esc="tableStateLabel(tb)"/>)</small>
+                            </button>
+                        </div>
+                        <button class="adk_btn adk_btn_ghost mt-3" t-on-click="closeModal">Annuler</button>
+                    </t>
+
+                    <!-- Séparation d'addition -->
+                    <t t-elif="state.modal === 'split'">
+                        <h3>Séparer l'addition</h3>
+                        <p class="adk_hint">Choisissez les articles qui partent dans une nouvelle addition.</p>
+                        <div class="adk_list">
+                            <div t-foreach="state.order.lines" t-as="line" t-key="line.id" class="adk_list_item adk_split_row">
+                                <span><t t-esc="line.qty"/> × <t t-esc="line.name"/></span>
+                                <span class="adk_qty_ctrl">
+                                    <button class="adk_round_btn" t-on-click="() => this.changeSplit(line, -1)">−</button>
+                                    <span t-esc="state.m.picks[line.id]"/>
+                                    <button class="adk_round_btn" t-on-click="() => this.changeSplit(line, 1)">+</button>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="adk_row mt-3">
+                            <button class="adk_btn adk_btn_ghost" t-on-click="closeModal">Annuler</button>
+                            <button class="adk_btn adk_btn_primary" t-att-disabled="!splitCount" t-on-click="confirmSplit">Séparer (<t t-esc="splitCount"/>)</button>
+                        </div>
+                    </t>
+
+                    <!-- Remboursement -->
+                    <t t-elif="state.modal === 'refund'">
+                        <h3><i class="fa fa-undo"/> Rembourser <t t-esc="state.order.name"/></h3>
+                        <div class="adk_list">
+                            <div t-foreach="state.order.lines" t-as="line" t-key="line.id" t-if="line.refundable_qty > 0" class="adk_list_item adk_split_row">
+                                <span><t t-esc="line.name"/> <small class="adk_hint">(max <t t-esc="line.refundable_qty"/>)</small></span>
+                                <span class="adk_qty_ctrl">
+                                    <button class="adk_round_btn" t-on-click="() => this.changeRefund(line, -1)">−</button>
+                                    <span t-esc="state.m.picks[line.id]"/>
+                                    <button class="adk_round_btn" t-on-click="() => this.changeRefund(line, 1)">+</button>
+                                </span>
+                            </div>
+                        </div>
+                        <button class="adk_btn adk_btn_small mt-2" t-on-click="refundAll">Tout sélectionner</button>
+                        <div class="adk_field mt-2"><label>Rembourser via</label>
+                            <select class="adk_input" t-model.number="state.m.methodId">
+                                <option t-foreach="state.cfg.payment_methods" t-as="pm" t-key="pm.id" t-att-value="pm.id" t-esc="pm.name"/>
+                            </select>
+                        </div>
+                        <div class="adk_field"><label>Motif (obligatoire)</label><input type="text" t-model="state.m.reason" placeholder="Plat froid, erreur de commande…"/></div>
+                        <div class="adk_total_row adk_total_main"><span>Montant remboursé</span><span t-esc="formatMoney(refundTotal)"/></div>
+                        <div class="adk_row mt-3">
+                            <button class="adk_btn adk_btn_ghost" t-on-click="closeModal">Annuler</button>
+                            <button class="adk_btn adk_btn_warning" t-on-click="confirmRefund">Rembourser</button>
+                        </div>
+                    </t>
+
+                    <!-- Entrée / sortie de caisse -->
+                    <t t-elif="state.modal === 'cashMove'">
+                        <h3>Mouvement de caisse</h3>
+                        <div class="adk_chip_row">
+                            <button t-attf-class="adk_chip #{state.m.type === 'in' ? 'active' : ''}" t-on-click="() => this.setM('type', 'in')">Entrée</button>
+                            <button t-attf-class="adk_chip #{state.m.type === 'out' ? 'active' : ''}" t-on-click="() => this.setM('type', 'out')">Sortie</button>
+                        </div>
+                        <div class="adk_big_amount"><t t-esc="state.m.amount || 0"/></div>
+                        <t t-set="npFn" t-value="(k) => this.numpadKey('m.amount', k)"/>
+                        <t t-set="npDot" t-value="true"/>
+                        <t t-call="adk_pos.Numpad"/>
+                        <div class="adk_field mt-2"><label>Motif</label><input type="text" t-model="state.m.reason" placeholder="Achat de glaçons, fond de caisse…"/></div>
+                        <div class="adk_row mt-3">
+                            <button class="adk_btn adk_btn_ghost" t-on-click="closeModal">Annuler</button>
+                            <button class="adk_btn adk_btn_primary" t-on-click="confirmCashMove">Enregistrer</button>
+                        </div>
+                    </t>
+
+                    <!-- Fermeture de caisse -->
+                    <t t-elif="state.modal === 'closeSession'">
+                        <h3><i class="fa fa-lock"/> Fermeture de caisse — <t t-esc="state.m.info.name"/></h3>
+                        <div class="adk_alert" t-if="state.m.info.pending.length">
+                            <strong><t t-esc="state.m.info.pending.length"/> commande(s) non réglée(s) :</strong>
+                            <t t-foreach="state.m.info.pending" t-as="po" t-key="po.id"><span class="adk_pill"><t t-esc="po.name"/> <t t-if="po.table">(<t t-esc="po.table"/>)</t></span> </t>
+                        </div>
+                        <div class="adk_summary_grid">
+                            <div><span class="adk_hint">Ventes nettes</span><strong t-esc="formatMoney(state.m.info.total_sales)"/></div>
+                            <div><span class="adk_hint">Commandes</span><strong t-esc="state.m.info.orders_paid"/></div>
+                            <div t-foreach="state.m.info.payments" t-as="pm" t-key="pm.name"><span class="adk_hint" t-esc="pm.name"/><strong t-esc="formatMoney(pm.amount)"/></div>
+                            <div t-if="!state.m.info.blind"><span class="adk_hint">Espèces attendues</span><strong t-esc="formatMoney(state.m.info.expected)"/></div>
+                        </div>
+                        <h4>Comptez le tiroir-caisse</h4>
+                        <div class="adk_count_grid">
+                            <div t-foreach="state.cfg.denominations" t-as="d" t-key="d" class="adk_count_row">
+                                <span class="adk_count_denom" t-esc="formatMoney(d)"/>
+                                <button class="adk_round_btn" t-on-click="() => this.changeCloseCount(d, -1)">−</button>
+                                <span class="adk_count_qty" t-esc="state.m.counts[d] || 0"/>
+                                <button class="adk_round_btn" t-on-click="() => this.changeCloseCount(d, 1)">+</button>
+                            </div>
+                        </div>
+                        <div class="adk_field"><label>Total compté</label><input type="text" inputmode="decimal" t-model="state.m.balance" placeholder="0"/></div>
+                        <div t-if="closeDifference !== null" t-attf-class="adk_diff #{closeDifference === 0 ? 'ok' : 'ko'}">
+                            Écart : <strong t-esc="formatMoney(closeDifference)"/>
+                        </div>
+                        <div class="adk_field"><label>Note (facultatif)</label><input type="text" t-model="state.m.note"/></div>
+                        <div class="adk_row">
+                            <button class="adk_btn adk_btn_ghost" t-on-click="closeModal">Annuler</button>
+                            <button class="adk_btn adk_btn_danger" t-on-click="confirmCloseSession">Fermer la caisse</button>
+                        </div>
+                    </t>
+
+                    <!-- QR & kiosque -->
+                    <t t-elif="state.modal === 'printers'">
+                        <h3><i class="fa fa-print"/> Imprimantes &amp; matériel</h3>
+                        <div class="adk_list">
+                            <div t-foreach="state.printers" t-as="pr" t-key="pr.id" class="adk_list_item">
+                                <span><strong t-esc="pr.name"/> <span class="adk_pill" t-esc="{browser: 'Navigateur', network: 'Réseau', webusb: 'USB', webserial: 'Série / Bluetooth', bridge: 'Passerelle'}[pr.connection]"/></span>
+                                <button class="adk_btn adk_btn_small adk_btn_primary" t-on-click="() => this.testPrinter(pr)">Tester</button>
+                            </div>
+                            <div t-if="!state.printers.length" class="adk_empty">
+                                Aucune imprimante configurée : l'impression passe par le navigateur.
+                                Ajoutez-en dans Paramètres → Imprimantes &amp; matériel.
+                            </div>
+                        </div>
+                        <div t-if="state.cfg.customer_display_url" class="adk_hint mt-3">Afficheur client : <t t-esc="state.cfg.customer_display_url"/></div>
+                        <button class="adk_btn adk_btn_ghost mt-3" t-on-click="closeModal">Fermer</button>
+                    </t>
+
+                    <t t-elif="state.modal === 'kiosk'">
+                        <h3><i class="fa fa-qrcode"/> Commande client par QR code</h3>
+                        <t t-if="state.cfg.kiosk_enabled">
+                            <div class="adk_kiosk_box">
+                                <img t-att-src="kioskQrUrl" alt="QR code" width="200" height="200"/>
+                                <div class="adk_hint" t-esc="kioskUrl"/>
+                            </div>
+                            <div class="adk_row mt-2">
+                                <button class="adk_btn adk_btn_small" t-on-click="copyKioskLink"><i class="fa fa-copy"/> Copier le lien</button>
+                                <button t-if="state.cfg.use_tables" class="adk_btn adk_btn_small" t-on-click="printTableQrs"><i class="fa fa-print"/> QR par table</button>
+                                <button t-if="isManager" class="adk_btn adk_btn_small adk_btn_ghost" t-on-click="toggleKioskEnabled">Désactiver</button>
+                            </div>
+                        </t>
+                        <t t-else="">
+                            <p>Le menu QR n'est pas activé pour ce point de vente.</p>
+                            <button t-if="isManager" class="adk_btn adk_btn_primary" t-on-click="toggleKioskEnabled">Activer maintenant</button>
+                        </t>
+                        <button class="adk_btn adk_btn_ghost mt-3" t-on-click="closeModal">Fermer</button>
+                    </t>
+
+                </div>
+            </div>
+
+        </div>
+    </t>
+
+</templates>

@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- ============ CATÉGORIES ============ -->
+        <record id="categ_plats" model="product.category">
+            <field name="name">Plats</field>
+        </record>
+        <record id="categ_boissons" model="product.category">
+            <field name="name">Boissons</field>
+        </record>
+        <record id="categ_desserts" model="product.category">
+            <field name="name">Desserts &amp; Pâtisseries</field>
+        </record>
+        <record id="categ_vetements_homme" model="product.category">
+            <field name="name">Vêtements Homme</field>
+        </record>
+        <record id="categ_vetements_femme" model="product.category">
+            <field name="name">Vêtements Femme</field>
+        </record>
+        <record id="categ_chaussures" model="product.category">
+            <field name="name">Chaussures</field>
+        </record>
+
+        <!-- ============ PRODUITS RESTAURANT / CAFÉ ============ -->
+        <record id="product_ndole" model="product.template">
+            <field name="name">Ndolé + viande</field>
+            <field name="categ_id" ref="categ_plats"/>
+            <field name="list_price">3500</field>
+            <field name="sale_ok">True</field>
+            <field name="adk_pos_course">main</field>
+        </record>
+        <record id="product_poulet_dg" model="product.template">
+            <field name="name">Poulet DG</field>
+            <field name="categ_id" ref="categ_plats"/>
+            <field name="list_price">5000</field>
+            <field name="sale_ok">True</field>
+            <field name="adk_pos_course">main</field>
+        </record>
+        <record id="product_eru" model="product.template">
+            <field name="name">Eru + Bâton de manioc</field>
+            <field name="categ_id" ref="categ_plats"/>
+            <field name="list_price">3000</field>
+            <field name="sale_ok">True</field>
+            <field name="adk_pos_course">main</field>
+        </record>
+        <record id="product_riz_sauce" model="product.template">
+            <field name="name">Riz sauté + Sauce</field>
+            <field name="categ_id" ref="categ_plats"/>
+            <field name="list_price">2500</field>
+            <field name="sale_ok">True</field>
+            <field name="adk_pos_course">main</field>
+        </record>
+        <record id="product_brochettes" model="product.template">
+            <field name="name">Brochettes de bœuf (x5)</field>
+            <field name="categ_id" ref="categ_plats"/>
+            <field name="list_price">2000</field>
+            <field name="sale_ok">True</field>
+            <field name="adk_pos_course">main</field>
+        </record>
+
+        <record id="product_jus_bissap" model="product.template">
+            <field name="name">Jus de Bissap</field>
+            <field name="categ_id" ref="categ_boissons"/>
+            <field name="list_price">1000</field>
+            <field name="sale_ok">True</field>
+            <field name="adk_pos_course">drink</field>
+        </record>
+        <record id="product_jus_gingembre" model="product.template">
+            <field name="name">Jus de Gingembre</field>
+            <field name="categ_id" ref="categ_boissons"/>
+            <field name="list_price">1000</field>
+            <field name="sale_ok">True</field>
+            <field name="adk_pos_course">drink</field>
+        </record>
+        <record id="product_eau_minerale" model="product.template">
+            <field name="name">Eau minérale 50cl</field>
+            <field name="categ_id" ref="categ_boissons"/>
+            <field name="list_price">500</field>
+            <field name="sale_ok">True</field>
+            <field name="adk_pos_course">drink</field>
+        </record>
+        <record id="product_coca" model="product.template">
+            <field name="name">Coca-Cola 33cl</field>
+            <field name="categ_id" ref="categ_boissons"/>
+            <field name="list_price">700</field>
+            <field name="sale_ok">True</field>
+            <field name="adk_pos_course">drink</field>
+        </record>
+        <record id="product_biere" model="product.template">
+            <field name="name">Bière locale 65cl</field>
+            <field name="categ_id" ref="categ_boissons"/>
+            <field name="list_price">1200</field>
+            <field name="sale_ok">True</field>
+            <field name="adk_pos_course">drink</field>
+        </record>
+        <record id="product_cafe" model="product.template">
+            <field name="name">Café expresso</field>
+            <field name="categ_id" ref="categ_boissons"/>
+            <field name="list_price">800</field>
+            <field name="sale_ok">True</field>
+            <field name="adk_pos_course">drink</field>
+        </record>
+
+        <record id="product_beignets" model="product.template">
+            <field name="name">Beignets - Haricots - Bouillie</field>
+            <field name="categ_id" ref="categ_desserts"/>
+            <field name="list_price">1000</field>
+            <field name="sale_ok">True</field>
+            <field name="adk_pos_course">dessert</field>
+        </record>
+        <record id="product_croissant" model="product.template">
+            <field name="name">Croissant</field>
+            <field name="categ_id" ref="categ_desserts"/>
+            <field name="list_price">700</field>
+            <field name="sale_ok">True</field>
+            <field name="adk_pos_course">dessert</field>
+        </record>
+
+        <!-- ============ PRODUITS BOUTIQUE / SHOPPING ============ -->
+        <record id="product_tshirt_homme" model="product.template">
+            <field name="name">T-shirt Homme</field>
+            <field name="categ_id" ref="categ_vetements_homme"/>
+            <field name="list_price">6000</field>
+            <field name="sale_ok">True</field>
+        </record>
+        <record id="product_jean_homme" model="product.template">
+            <field name="name">Jean Homme</field>
+            <field name="categ_id" ref="categ_vetements_homme"/>
+            <field name="list_price">15000</field>
+            <field name="sale_ok">True</field>
+        </record>
+        <record id="product_chemise_homme" model="product.template">
+            <field name="name">Chemise Homme</field>
+            <field name="categ_id" ref="categ_vetements_homme"/>
+            <field name="list_price">10000</field>
+            <field name="sale_ok">True</field>
+        </record>
+        <record id="product_robe_femme" model="product.template">
+            <field name="name">Robe Femme</field>
+            <field name="categ_id" ref="categ_vetements_femme"/>
+            <field name="list_price">18000</field>
+            <field name="sale_ok">True</field>
+        </record>
+        <record id="product_jupe_femme" model="product.template">
+            <field name="name">Jupe Femme</field>
+            <field name="categ_id" ref="categ_vetements_femme"/>
+            <field name="list_price">12000</field>
+            <field name="sale_ok">True</field>
+        </record>
+        <record id="product_sac_femme" model="product.template">
+            <field name="name">Sac à main</field>
+            <field name="categ_id" ref="categ_vetements_femme"/>
+            <field name="list_price">20000</field>
+            <field name="sale_ok">True</field>
+        </record>
+        <record id="product_baskets" model="product.template">
+            <field name="name">Baskets</field>
+            <field name="categ_id" ref="categ_chaussures"/>
+            <field name="list_price">25000</field>
+            <field name="sale_ok">True</field>
+        </record>
+        <record id="product_sandales" model="product.template">
+            <field name="name">Sandales</field>
+            <field name="categ_id" ref="categ_chaussures"/>
+            <field name="list_price">9000</field>
+            <field name="sale_ok">True</field>
+        </record>
+        <record id="product_chaussures_ville" model="product.template">
+            <field name="name">Chaussures de ville</field>
+            <field name="categ_id" ref="categ_chaussures"/>
+            <field name="list_price">22000</field>
+            <field name="sale_ok">True</field>
+        </record>
+
+    </data>
+</odoo>

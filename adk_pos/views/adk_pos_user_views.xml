@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_users_form_adk_pos" model="ir.ui.view">
+        <field name="name">res.users.form.adk.pos</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="ADK Point de Vente" name="adk_pos" groups="adk_pos.group_adk_pos_manager">
+                    <group>
+                        <group string="Accès au terminal">
+                            <field name="adk_pos_role" widget="radio"/>
+                            <field name="adk_pos_pin_input" password="True" placeholder="4 à 6 chiffres"/>
+                            <field name="adk_pos_has_pin" readonly="1" widget="boolean_toggle"/>
+                            <field name="adk_pos_config_ids" widget="many2many_tags"/>
+                        </group>
+                        <group string="Écrans de préparation">
+                            <field name="adk_pos_station_ids" widget="many2many_tags"
+                                   placeholder="Tous les écrans si vide"/>
+                        </group>
+                    </group>
+                    <p class="text-muted">Choisissez le rôle, saisissez le code PIN de la personne puis
+                        enregistrez : elle peut se connecter au terminal. Un serveur peut être limité à l'écran
+                        « Bar », un cuisinier à l'écran « Cuisine ».</p>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_adk_pos_station_form" model="ir.ui.view">
+        <field name="name">adk.pos.station.form</field>
+        <field name="model">adk.pos.station</field>
+        <field name="arch" type="xml">
+            <form string="Écran de préparation">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="pos_type"/>
+                            <field name="config_ids" widget="many2many_tags"/>
+                            <field name="sequence"/>
+                            <field name="color" widget="color_picker"/>
+                        </group>
+                        <group>
+                            <field name="category_ids" widget="many2many_tags"/>
+                            <field name="user_ids" widget="many2many_tags" placeholder="Tout le personnel si vide"/>
+                        </group>
+                    </group>
+                    <p class="text-muted">Les articles des catégories choisies s'affichent sur cet écran.
+                        Réservez l'écran à certaines personnes (ex : Bar → serveurs du bar), ou laissez vide
+                        pour que tout le personnel le voie.</p>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

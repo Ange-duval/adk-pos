@@ -1,0 +1,912 @@
+// ============ ÉCRANS TACTILES (Serveurs / Caissière) ============
+// Gros boutons, contrastes forts : lisible en tablette comme au clavier/souris sur PC
+
+.adk_touch_screen {
+    height: 100%;
+    background: #F6F7FB;
+    display: flex;
+    flex-direction: column;
+    font-size: 15px;
+
+    .adk_dashboard_loading, .adk_no_session, .adk_open_session_panel {
+        margin: auto;
+        text-align: center;
+        color: #4A4F6A;
+        padding: 40px;
+
+        i { font-size: 42px; color: #6C63FF; margin-bottom: 14px; display: block; }
+        h3 { color: #2C3357; margin-bottom: 8px; }
+    }
+
+    .adk_open_session_form {
+        margin-top: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-width: 280px;
+        margin-left: auto;
+        margin-right: auto;
+
+        input {
+            padding: 14px;
+            border-radius: 10px;
+            border: 1px solid #DADEEB;
+            font-size: 16px;
+            text-align: center;
+        }
+    }
+
+    .adk_touch_topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 16px 20px;
+        background: #fff;
+        box-shadow: 0 2px 10px rgba(44,51,87,.05);
+
+        h3 { margin: 0; color: #2C3357; font-weight: 600; }
+    }
+
+    .adk_back_btn {
+        border: none;
+        background: #EEF0F7;
+        color: #2C3357;
+        padding: 10px 16px;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .adk_floor_tabs, .adk_category_tabs {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .adk_floor_tab, .adk_category_tab {
+        border: none;
+        background: #EEF0F7;
+        color: #4A4F6A;
+        padding: 10px 18px;
+        border-radius: 20px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all .15s ease;
+
+        &.active { background: #6C63FF; color: #fff; }
+    }
+
+    // ------- PLAN DE SALLE -------
+    .adk_table_grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 16px;
+        padding: 20px;
+        overflow-y: auto;
+    }
+
+    .adk_touch_table {
+        border-radius: 16px;
+        padding: 22px 12px;
+        text-align: center;
+        color: #fff;
+        font-weight: 600;
+        cursor: pointer;
+        min-height: 100px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 6px;
+        box-shadow: 0 4px 14px rgba(0,0,0,.08);
+        transition: transform .12s ease;
+
+        &:active { transform: scale(0.96); }
+
+        &.adk_table_free { background: linear-gradient(135deg, #2ECC9E, #22B98A); }
+        &.adk_table_occupied { background: linear-gradient(135deg, #FF6B6B, #E85555); }
+        &.adk_table_reserved { background: linear-gradient(135deg, #F5A623, #E39413); }
+        &.adk_table_billing { background: linear-gradient(135deg, #6C63FF, #574FE0); }
+
+        .adk_touch_table_name { font-size: 18px; }
+        .adk_touch_table_seats { font-size: 12px; opacity: .9; }
+    }
+
+    // ------- CATALOGUE + PANIER -------
+    .adk_catalog_screen {
+        display: flex;
+        flex: 1;
+        min-height: 0;
+    }
+
+    .adk_catalog_main {
+        flex: 2;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+    }
+
+    .adk_product_grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+        gap: 16px;
+        padding: 20px;
+        overflow-y: auto;
+    }
+
+    .adk_touch_product {
+        background: #fff;
+        border-radius: 16px;
+        padding: 0 0 10px;
+        text-align: center;
+        cursor: pointer;
+        box-shadow: 0 3px 12px rgba(44,51,87,.07);
+        transition: transform .12s ease;
+        display: flex;
+        flex-direction: column;
+        height: auto;
+        min-height: 190px;
+
+        &:active { transform: scale(0.96); }
+
+        .adk_touch_product_name {
+            font-weight: 600; color: #2C3357; font-size: 13px;
+            padding: 8px 10px 0;
+            line-height: 17px;
+        }
+
+        .adk_touch_product_price {
+            color: #6C63FF;
+            font-weight: 700;
+            font-size: 13px;
+            padding: 4px 10px 0;
+            margin-top: auto;
+        }
+    }
+
+    .adk_cart_panel {
+        flex: 1;
+        min-width: 300px;
+        max-width: 360px;
+        background: #fff;
+        border-left: 1px solid #EEF0F7;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+
+        h4 { color: #2C3357; margin-bottom: 14px; }
+    }
+
+    .adk_cart_lines { flex: 1; overflow-y: auto; }
+
+    .adk_cart_line {
+        display: grid;
+        grid-template-columns: 1fr auto auto;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 0;
+        border-bottom: 1px solid #F1F2F8;
+        font-size: 13.5px;
+    }
+
+    .adk_cart_line_controls {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        button {
+            width: 28px; height: 28px;
+            border-radius: 8px;
+            border: none;
+            background: #EEF0F7;
+            font-weight: 700;
+            cursor: pointer;
+        }
+    }
+
+    .adk_cart_line_price { font-weight: 600; color: #2C3357; min-width: 60px; text-align: right; }
+
+    .adk_cart_total {
+        display: flex;
+        justify-content: space-between;
+        padding: 16px 0;
+        font-size: 17px;
+        color: #2C3357;
+        border-top: 2px solid #EEF0F7;
+        margin-top: 10px;
+    }
+
+    .adk_send_btn, .adk_pay_btn {
+        border: none;
+        border-radius: 12px;
+        padding: 16px;
+        font-size: 15px;
+        font-weight: 700;
+        color: #fff;
+        cursor: pointer;
+        width: 100%;
+    }
+
+    .adk_send_btn { background: linear-gradient(135deg, #6C63FF, #574FE0); }
+    .adk_pay_btn { background: linear-gradient(135deg, #2ECC9E, #22B98A); margin-top: 14px; }
+
+    // ------- ÉCRAN CAISSE -------
+    .adk_cashier_body {
+        display: flex;
+        flex: 1;
+        min-height: 0;
+    }
+
+    .adk_cashier_queue {
+        width: 320px;
+        background: #fff;
+        border-right: 1px solid #EEF0F7;
+        padding: 18px;
+        overflow-y: auto;
+
+        h4 { color: #2C3357; margin-bottom: 14px; }
+    }
+
+    .adk_queue_ticket {
+        border-radius: 12px;
+        padding: 14px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        background: #F6F7FB;
+        border: 2px solid transparent;
+        font-size: 13px;
+        color: #4A4F6A;
+
+        &.active { border-color: #6C63FF; background: #F0EEFF; }
+        &.adk_ticket_billing { border-left: 4px solid #6C63FF; }
+
+        .adk_queue_ticket_top {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .adk_ticket_badge {
+            font-size: 10.5px;
+            background: #F5A623;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .adk_queue_ticket_amount {
+            font-weight: 700;
+            color: #2C3357;
+            margin-top: 6px;
+        }
+    }
+
+    .adk_cashier_detail {
+        flex: 1;
+        padding: 26px;
+        overflow-y: auto;
+    }
+
+    .adk_detail_placeholder {
+        margin-top: 60px;
+    }
+
+    .adk_detail_lines {
+        width: 100%;
+        margin: 16px 0;
+        td { padding: 6px 0; border-bottom: 1px solid #F1F2F8; font-size: 14px; color: #4A4F6A; }
+    }
+
+    .adk_detail_total {
+        display: flex;
+        justify-content: space-between;
+        font-size: 20px;
+        color: #2C3357;
+        padding: 14px 0;
+        border-top: 2px solid #EEF0F7;
+        margin-bottom: 18px;
+    }
+
+    .adk_payment_panel {
+        margin-top: 20px;
+        background: #F6F7FB;
+        border-radius: 14px;
+        padding: 20px;
+        max-width: 420px;
+    }
+
+    .adk_payment_methods {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin: 14px 0;
+    }
+
+    .adk_pm_btn {
+        border: 2px solid #DADEEB;
+        background: #fff;
+        border-radius: 10px;
+        padding: 14px;
+        font-weight: 600;
+        color: #4A4F6A;
+        cursor: pointer;
+
+        &.active { border-color: #6C63FF; background: #F0EEFF; color: #6C63FF; }
+    }
+
+    .adk_cash_inputs, .adk_ref_inputs {
+        input {
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            border: 1px solid #DADEEB;
+            font-size: 16px;
+            margin-top: 6px;
+        }
+    }
+
+    .adk_change_row {
+        margin-top: 10px;
+        font-size: 15px;
+        color: #2C3357;
+    }
+}
+
+// Responsive : PC/HP avec petit écran -> panneau caisse en colonne
+@media (max-width: 900px) {
+    .adk_touch_screen .adk_cashier_body,
+    .adk_touch_screen .adk_catalog_screen {
+        flex-direction: column;
+    }
+    .adk_touch_screen .adk_cashier_queue,
+    .adk_touch_screen .adk_cart_panel {
+        width: 100%;
+        max-width: none;
+    }
+}
+
+// ============ ÉCRAN D'IDENTIFICATION (Employé + PIN) ============
+.adk_pin_screen {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+}
+
+.adk_employee_grid {
+    text-align: center;
+    position: relative;
+    padding-top: 56px;
+    h3 { color: #2C3357; margin-bottom: 24px; }
+}
+
+.adk_employee_grid_items {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 16px;
+    max-width: 560px;
+}
+
+.adk_employee_card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 22px 12px;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(44,51,87,.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    color: #2C3357;
+    font-weight: 600;
+    transition: transform .12s ease;
+
+    i { font-size: 26px; color: #6C63FF; }
+    &:active { transform: scale(0.95); background: #F0EEFF; }
+}
+
+.adk_pin_pad_wrap {
+    text-align: center;
+    h3 { color: #2C3357; margin-bottom: 18px; }
+}
+
+.adk_pin_input {
+    display: block;
+    width: 220px;
+    margin: 0 auto 20px;
+    padding: 18px;
+    font-size: 28px;
+    letter-spacing: 10px;
+    text-align: center;
+    border-radius: 14px;
+    border: 2px solid #DADEEB;
+    color: #2C3357;
+    box-shadow: 0 3px 10px rgba(44,51,87,.06);
+
+    &:focus { outline: none; border-color: #6C63FF; }
+}
+
+.adk_pin_confirm_btn { max-width: 220px; margin: 0 auto 16px; }
+
+.adk_topbar_user {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #F0EEFF;
+    color: #6C63FF;
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.adk_change_user_btn {
+    border: none;
+    background: transparent;
+    color: #6C63FF;
+    cursor: pointer;
+    font-size: 14px;
+    margin-left: 4px;
+}
+
+.adk_close_session_btn {
+    border: none;
+    background: #FFEAEA;
+    color: #E85555;
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 12.5px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.adk_hamburger_btn {
+    border: none;
+    background: #EEF0F7;
+    color: #2C3357;
+    width: 34px; height: 34px;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-left: 8px;
+}
+
+.adk_hamburger_menu {
+    background: #fff;
+    border-radius: 16px;
+    padding: 10px;
+    width: 260px;
+    max-width: 90vw;
+    box-shadow: 0 14px 40px rgba(0,0,0,.2);
+}
+
+.adk_hamburger_item {
+    padding: 14px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    color: #2C3357;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+
+    i { width: 18px; color: #6C63FF; }
+    &:hover, &:active { background: #F0EEFF; }
+    &.adk_hamburger_danger { color: #E85555; i { color: #E85555; } }
+}
+
+.adk_kiosk_block {
+    text-align: center;
+    margin: 16px 0;
+}
+
+.adk_kiosk_qr {
+    width: 160px;
+    height: 160px;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px rgba(44,51,87,.1);
+    margin-bottom: 12px;
+}
+
+.adk_kiosk_link {
+    font-size: 12px;
+    color: #6C63FF;
+    word-break: break-all;
+    background: #F6F7FB;
+    padding: 8px 10px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+
+.text-muted-adk {
+    color: #8A8FA3;
+    font-size: 12.5px;
+    margin-bottom: 14px;
+}
+
+.adk_client_results {
+    max-height: 180px;
+    overflow-y: auto;
+    margin: 10px 0;
+}
+
+.adk_client_result_item {
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13.5px;
+    color: #2C3357;
+
+    i { color: #6C63FF; margin-right: 8px; }
+    &:hover, &:active { background: #F0EEFF; }
+}
+
+.adk_cashier_body_wrap {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+}
+
+// ============ SÉLECTION DU POINT DE VENTE ============
+.adk_config_picker {
+    padding: 40px;
+    text-align: center;
+
+    h3 { color: #2C3357; margin-bottom: 28px; }
+}
+
+.adk_config_grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.adk_config_card {
+    background: #fff;
+    border-radius: 18px;
+    padding: 0 18px 26px;
+    box-shadow: 0 4px 16px rgba(44,51,87,.08);
+    cursor: pointer;
+    transition: transform .15s ease, box-shadow .15s ease;
+    overflow: hidden;
+    position: relative;
+
+    &:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(44,51,87,.16); }
+
+    .adk_config_card_banner {
+        height: 64px;
+        margin: 0 -18px 0;
+        border-radius: 0 0 40% 40% / 0 0 100% 100%;
+    }
+
+    .adk_config_card_icon {
+        width: 60px; height: 60px;
+        border-radius: 16px;
+        color: #fff;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 26px;
+        margin: -40px auto 14px;
+        box-shadow: 0 6px 16px rgba(0,0,0,.18);
+    }
+    .adk_config_card_name { font-weight: 700; color: #2C3357; margin-bottom: 8px; font-size: 15px; }
+    .adk_config_card_status {
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 16px;
+        i { font-size: 8px; margin-right: 4px; }
+        &.open { color: #2ECC9E; }
+        &.closed { color: #B0B4C3; }
+    }
+
+    &.adk_theme_violet {
+        .adk_config_card_banner { background: linear-gradient(135deg, #6C63FF, #9F97FF); }
+        .adk_config_card_icon { background: linear-gradient(135deg, #6C63FF, #574FE0); }
+    }
+    &.adk_theme_teal {
+        .adk_config_card_banner { background: linear-gradient(135deg, #2ECC9E, #6EE7C4); }
+        .adk_config_card_icon { background: linear-gradient(135deg, #22B98A, #2ECC9E); }
+    }
+    &.adk_theme_orange {
+        .adk_config_card_banner { background: linear-gradient(135deg, #F5A623, #FFCB7D); }
+        .adk_config_card_icon { background: linear-gradient(135deg, #E39413, #F5A623); }
+    }
+    &.adk_theme_pink {
+        .adk_config_card_banner { background: linear-gradient(135deg, #FF6B9D, #FFA6C9); }
+        .adk_config_card_icon { background: linear-gradient(135deg, #E8437E, #FF6B9D); }
+    }
+}
+
+.adk_main_wrap {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+}
+
+.adk_main_tabs { display: flex; gap: 8px; }
+
+.adk_floor_tabs_row {
+    padding: 14px 20px 0;
+}
+
+.adk_back_floating {
+    position: absolute;
+    top: 0; left: 0;
+    z-index: 2;
+    background: #EEF0F7;
+}
+
+.adk_quick_sale {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.adk_quick_sale_btn { max-width: 260px; padding: 24px; font-size: 17px; }
+
+.adk_queue_full { width: 100%; border: none; padding: 24px; }
+
+.adk_queue_grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 14px;
+}
+
+// ============ MODALES (menu de table / actions) ============
+.adk_modal_backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(44,51,87,.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.adk_table_menu_popover, .adk_actions_modal {
+    background: #fff;
+    border-radius: 18px;
+    padding: 26px;
+    width: 360px;
+    max-width: 90vw;
+    box-shadow: 0 14px 40px rgba(0,0,0,.2);
+
+    h3, h4 { color: #2C3357; margin-bottom: 16px; }
+
+    > button { margin-top: 10px; width: 100%; }
+}
+
+.adk_reserve_block {
+    margin-top: 14px;
+    text-align: left;
+
+    label { font-size: 12.5px; color: #4A4F6A; }
+    input {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #DADEEB;
+        margin: 6px 0 10px;
+    }
+}
+
+.adk_actions_btn {
+    border: none;
+    background: #F0EEFF;
+    color: #6C63FF;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.adk_cart_toolbar {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin: 14px 0;
+}
+
+.adk_toolbar_btn {
+    border: 1px solid #EEF0F7;
+    background: #F6F7FB;
+    color: #4A4F6A;
+    padding: 10px 4px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 11.5px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+
+    i { font-size: 15px; color: #6C63FF; }
+    span {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+    }
+    &:hover, &:active { background: #EEF0F7; }
+}
+
+.adk_actions_grid { display: flex; flex-direction: column; gap: 14px; margin-bottom: 16px; }
+
+.adk_action_field {
+    text-align: left;
+    label { display: block; font-size: 12.5px; color: #4A4F6A; margin-bottom: 6px; }
+    input, textarea {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #DADEEB;
+        font-family: inherit;
+    }
+    textarea { min-height: 70px; resize: vertical; }
+}
+
+.adk_cancel_order_btn {
+    border: none;
+    background: #FFEAEA;
+    color: #E85555;
+    border-radius: 12px;
+    padding: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    width: 100%;
+}
+
+.adk_actions_modal_wide { width: 480px; }
+
+.adk_actions_modal_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.adk_modal_close_x {
+    border: none;
+    background: none;
+    font-size: 16px;
+    color: #8A8FA3;
+    cursor: pointer;
+}
+
+.adk_actions_cards_grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 16px 0;
+}
+
+.adk_action_card {
+    position: relative;
+    background: #F6F7FB;
+    border-radius: 12px;
+    padding: 18px 8px;
+    text-align: center;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #2C3357;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+
+    i { font-size: 18px; color: #6C63FF; }
+    &:hover, &:active { background: #EEF0F7; }
+
+    &.adk_action_card_primary { background: #E8FBF4; i { color: #2ECC9E; } }
+    &.adk_action_card_danger { background: #FFEAEA; color: #E85555; i { color: #E85555; } }
+}
+
+.adk_action_card_badge {
+    position: absolute;
+    top: 6px; right: 10px;
+    background: #6C63FF;
+    color: #fff;
+    font-size: 10px;
+    border-radius: 10px;
+    padding: 1px 6px;
+}
+
+.adk_guests_inline {
+    background: #F6F7FB;
+    border-radius: 12px;
+    padding: 14px;
+}
+
+.adk_payment_success {
+    text-align: center;
+    padding: 20px 10px;
+}
+
+.adk_payment_success_badge {
+    background: #E8FBF4;
+    color: #2ECC9E;
+    border-radius: 12px;
+    padding: 14px;
+    font-weight: 700;
+    margin-bottom: 14px;
+
+    i { margin-right: 6px; }
+}
+
+.adk_payment_success_amount {
+    font-size: 24px;
+    font-weight: 700;
+    color: #2C3357;
+    margin-bottom: 18px;
+}
+
+.adk_touch_product_img {
+    width: 100%;
+    height: 140px;
+    flex-shrink: 0;
+    border-radius: 0;
+    overflow: hidden;
+    background: #F1F2F8;
+    position: relative;
+
+    img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    .adk_touch_product_placeholder {
+        width: 100%; height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 40px;
+        font-weight: 700;
+        color: #fff;
+        background: linear-gradient(135deg, #6C63FF, #9F97FF);
+    }
+
+    .adk_touch_product_qty_badge {
+        position: absolute;
+        bottom: 6px; right: 6px;
+        background: #6C63FF;
+        color: #fff;
+        font-size: 15px;
+        font-weight: 700;
+        min-width: 24px;
+        height: 24px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 6px;
+        box-shadow: 0 2px 6px rgba(0,0,0,.2);
+    }
+}
+
+.adk_cart_empty {
+    text-align: center;
+    padding: 40px 10px;
+    color: #B0B4C3;
+
+    i { font-size: 34px; display: block; margin-bottom: 14px; }
+    p { font-size: 13px; max-width: 200px; margin: 0 auto; }
+}
+
+.adk_reserve_inline {
+    margin-top: auto;
+    padding-top: 14px;
+
+    input {
+        width: 100%;
+        padding: 12px;
+        border-radius: 10px;
+        border: 1px solid #DADEEB;
+        margin-bottom: 10px;
+    }
+}
+
+.adk_reserve_btn { background: linear-gradient(135deg, #F5A623, #E39413); }

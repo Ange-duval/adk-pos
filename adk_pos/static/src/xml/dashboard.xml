@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="adk_pos.Dashboard">
+        <div class="adk_dashboard" t-translation="off">
+            <div class="adk_dash_top">
+                <h2>Tableau de bord</h2>
+                <select class="adk_input adk_k_select" t-on-change="onConfigChange">
+                    <option value="">Tous les points de vente</option>
+                    <option t-foreach="state.configs" t-as="cfg" t-key="cfg.id" t-att-value="cfg.id" t-esc="cfg.name"/>
+                </select>
+                <div class="adk_k_stations">
+                    <button t-attf-class="adk_chip #{state.period === 'today' ? 'active' : ''}" t-on-click="() => this.setPeriod('today')">Aujourd'hui</button>
+                    <button t-attf-class="adk_chip #{state.period === 'week' ? 'active' : ''}" t-on-click="() => this.setPeriod('week')">7 jours</button>
+                    <button t-attf-class="adk_chip #{state.period === 'month' ? 'active' : ''}" t-on-click="() => this.setPeriod('month')">30 jours</button>
+                </div>
+                <div class="adk_tab_spacer"/>
+                <button class="adk_btn adk_btn_primary" t-on-click="openTerminal"><i class="fa fa-desktop"/> Ouvrir le terminal</button>
+            </div>
+
+            <div t-if="state.loading" class="adk_empty"><i class="fa fa-spinner fa-spin"/></div>
+            <t t-elif="state.data">
+                <div class="adk_kpi_grid">
+                    <div class="adk_kpi adk_kpi_main">
+                        <div class="adk_kpi_label">Ventes nettes</div>
+                        <div class="adk_kpi_value" t-esc="money(state.data.total_sales)"/>
+                        <div t-attf-class="adk_kpi_sub #{state.data.variation >= 0 ? 'up' : 'down'}">
+                            <i t-attf-class="fa #{state.data.variation >= 0 ? 'fa-arrow-up' : 'fa-arrow-down'}"/>
+                            <t t-esc="Math.abs(state.data.variation).toFixed(1)"/> % vs période précédente
+                        </div>
+                    </div>
+                    <div class="adk_kpi">
+                        <div class="adk_kpi_label">Commandes</div>
+                        <div class="adk_kpi_value" t-esc="state.data.orders_count"/>
+                        <div class="adk_kpi_sub">Ticket moyen : <t t-esc="money(state.data.average_ticket)"/></div>
+                    </div>
+                    <div class="adk_kpi">
+                        <div class="adk_kpi_label">Remboursements</div>
+                        <div class="adk_kpi_value" t-esc="money(state.data.refunds_total)"/>
+                        <div class="adk_kpi_sub"><t t-esc="state.data.refunds_count"/> opération(s)</div>
+                    </div>
+                    <div class="adk_kpi">
+                        <div class="adk_kpi_label">Remises accordées</div>
+                        <div class="adk_kpi_value" t-esc="money(state.data.discount_total)"/>
+                        <div class="adk_kpi_sub">Pourboires : <t t-esc="money(state.data.tips_total)"/></div>
+                    </div>
+                    <div class="adk_kpi">
+                        <div class="adk_kpi_label">En salle</div>
+                        <div class="adk_kpi_value"><t t-esc="state.data.tables_occupied"/> / <t t-esc="state.data.tables_total"/></div>
+                        <div class="adk_kpi_sub"><t t-esc="state.data.open_orders"/> commande(s) en cours · <t t-esc="state.data.open_sessions"/> caisse(s) ouverte(s)</div>
+                    </div>
+                    <div class="adk_kpi">
+                        <div class="adk_kpi_label">Cuisine</div>
+                        <div class="adk_kpi_value"><t t-esc="state.data.avg_prep_minutes.toFixed(0)"/> min</div>
+                        <div class="adk_kpi_sub">Temps moyen de préparation · <t t-esc="state.data.reservations_today"/> réservation(s) aujourd'hui</div>
+                    </div>
+                </div>
+
+                <div class="adk_dash_cols">
+                    <div class="adk_card adk_dash_wide">
+                        <h4>Ventes par heure</h4>
+                        <div class="adk_hours">
+                            <div t-foreach="activeHours" t-as="h" t-key="h.hour" class="adk_hour_col">
+                                <div class="adk_hour_bar_wrap">
+                                    <div class="adk_hour_bar" t-att-style="'height:' + barHeight(h.total) + '%'" t-att-title="money(h.total)"/>
+                                </div>
+                                <div class="adk_hour_label"><t t-esc="h.hour"/>h</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="adk_card">
+                        <h4>Modes de paiement</h4>
+                        <div class="adk_donut_wrap" t-if="state.data.payments.length">
+                            <div class="adk_donut" t-att-style="donutStyle"/>
+                            <div class="adk_hint">Répartition des encaissements</div>
+                        </div>
+                        <div t-foreach="state.data.payments" t-as="p" t-key="p.name" class="adk_bar_row">
+                            <div class="adk_bar_label"><span t-esc="p.name"/><strong t-esc="money(p.total)"/></div>
+                            <div class="adk_bar_track"><div class="adk_bar_fill" t-att-style="'width:' + Math.max(p.total / paymentMax * 100, 0) + '%'"/></div>
+                        </div>
+                        <div t-if="!state.data.payments.length" class="adk_empty">Aucune donnée.</div>
+                    </div>
+                </div>
+
+                <div class="adk_dash_cols adk_dash_cols3">
+                    <div class="adk_card">
+                        <h4>Produits les plus vendus</h4>
+                        <table class="adk_mini_table">
+                            <tr t-foreach="state.data.top_products" t-as="p" t-key="p.name">
+                                <td t-esc="p.name"/><td class="num"><t t-esc="p.qty"/>×</td><td class="num" t-esc="money(p.total)"/>
+                            </tr>
+                        </table>
+                        <div t-if="!state.data.top_products.length" class="adk_empty">Aucune donnée.</div>
+                    </div>
+                    <div class="adk_card">
+                        <h4>Serveurs</h4>
+                        <table class="adk_mini_table">
+                            <tr t-foreach="state.data.top_servers" t-as="s" t-key="s.name">
+                                <td t-esc="s.name"/><td class="num"><t t-esc="s.count"/> cmd</td><td class="num" t-esc="money(s.total)"/>
+                            </tr>
+                        </table>
+                        <div t-if="!state.data.top_servers.length" class="adk_empty">Aucune donnée.</div>
+                    </div>
+                    <div class="adk_card">
+                        <h4>Caissiers</h4>
+                        <table class="adk_mini_table">
+                            <tr t-foreach="state.data.top_cashiers" t-as="c" t-key="c.name">
+                                <td t-esc="c.name"/><td class="num"><t t-esc="c.count"/> cmd</td><td class="num" t-esc="money(c.total)"/>
+                            </tr>
+                        </table>
+                        <div t-if="!state.data.top_cashiers.length" class="adk_empty">Aucune donnée.</div>
+                        <h4 class="mt-3">Types de commande</h4>
+                        <table class="adk_mini_table">
+                            <tr t-foreach="state.data.order_types" t-as="t" t-key="t.name">
+                                <td t-esc="t.name"/><td class="num"><t t-esc="t.count"/></td><td class="num" t-esc="money(t.total)"/>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>

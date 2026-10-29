@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_adk_pos_config_list" model="ir.ui.view">
+        <field name="name">adk.pos.config.list</field>
+        <field name="model">adk.pos.config</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="not active">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="pos_type"/>
+                <field name="manager_id"/>
+                <field name="session_count"/>
+                <field name="order_count"/>
+                <field name="active" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_adk_pos_config_form" model="ir.ui.view">
+        <field name="name">adk.pos.config.form</field>
+        <field name="model">adk.pos.config</field>
+        <field name="arch" type="xml">
+            <form string="Point de vente">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_sessions" type="object" class="oe_stat_button" icon="fa-history">
+                            <field name="session_count" widget="statinfo" string="Sessions"/>
+                        </button>
+                        <button name="action_view_orders" type="object" class="oe_stat_button" icon="fa-shopping-cart">
+                            <field name="order_count" widget="statinfo" string="Commandes"/>
+                        </button>
+                        <button name="action_view_reservations" type="object" class="oe_stat_button" icon="fa-calendar"
+                                invisible="not use_tables">
+                            <field name="reservation_count" widget="statinfo" string="Réservations"/>
+                        </button>
+                    </div>
+                    <field name="image_1920" widget="image" class="oe_avatar"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Ex: Table de l'Élite"/></h1>
+                    </div>
+                    <group>
+                        <group string="Type de point de vente">
+                            <field name="pos_type"/>
+                            <field name="use_tables" widget="boolean_toggle"/>
+                            <field name="active" widget="boolean_toggle"/>
+                        </group>
+                        <group string="Responsable">
+                            <field name="manager_id"/>
+                            <field name="currency_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Général" name="general">
+                            <group>
+                                <group string="Types de vente">
+                                    <field name="allow_takeaway" widget="boolean_toggle"/>
+                                    <field name="allow_delivery" widget="boolean_toggle"/>
+                                    <field name="takeaway_fiscal_position_id" invisible="not allow_takeaway and not allow_delivery"/>
+                                    <field name="tip_enabled" widget="boolean_toggle"/>
+                                </group>
+                                <group string="Salle &amp; addition" invisible="not use_tables">
+                                    <field name="allow_bill_print" widget="boolean_toggle"/>
+                                    <field name="allow_split" widget="boolean_toggle"/>
+                                    <field name="reservation_enabled" widget="boolean_toggle"/>
+                                    <field name="reservation_duration" invisible="not reservation_enabled"/>
+                                    <field name="reservation_lead_minutes" invisible="not reservation_enabled"/>
+                                    <field name="reservation_grace_minutes" invisible="not reservation_enabled"/>
+                                </group>
+                            </group>
+                            <group string="Équipe">
+                                <button name="%(action_adk_pos_employee_wizard)d" type="action"
+                                        string="+ Ajouter un membre du personnel" class="btn-primary mb-3"
+                                        context="{'default_config_id': id}" colspan="2"/>
+                                <field name="server_ids" widget="many2many_tags"/>
+                                <field name="cashier_ids" widget="many2many_tags"/>
+                            </group>
+                        </page>
+                        <page string="Salles / Tables" name="floors" invisible="not use_tables">
+                            <field name="floor_ids" context="{'default_config_id': id}">
+                                <list>
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="table_count"/>
+                                    <field name="background_image" widget="image" options="{'size': [0, 36]}"/>
+                                </list>
+                            </field>
+                            <button name="action_print_table_qrs" type="object" class="btn-secondary"
+                                    string="Imprimer les QR codes des tables" icon="fa-qrcode"/>
+                            <p class="text-muted mt-2">
+                                Cliquez sur une salle puis sur <b>« Générer les tables »</b> : indiquez le nombre de tables, elles
+                                sont créées et rangées automatiquement. Ajoutez au besoin l'<b>image de votre plan de salle</b> en fond,
+                                puis ouvrez le terminal (menu ☰ → <b>Modifier le plan de salle</b>) pour glisser chaque table à sa place.
+                            </p>
+                        </page>
+                        <page string="Commande client QR" name="kiosk">
+                            <group>
+                                <group string="Activation">
+                                    <field name="kiosk_enabled" widget="boolean_toggle"/>
+                                    <field name="kiosk_mode" invisible="not kiosk_enabled"/>
+                                    <field name="kiosk_service" invisible="not kiosk_enabled"/>
+                                    <field name="kiosk_auto_send" widget="boolean_toggle" invisible="not kiosk_enabled or kiosk_mode == 'qr_menu'"/>
+                                </group>
+                                <group string="Apparence" invisible="not kiosk_enabled">
+                                    <field name="kiosk_welcome_text"/>
+                                    <field name="kiosk_header_image" widget="image" options="{'size': [0, 90]}"/>
+                                    <field name="kiosk_splash_ids" widget="many2many_binary"/>
+                                </group>
+                            </group>
+                            <p class="text-muted">
+                                Le lien et le QR code de commande autonome sont disponibles depuis le terminal
+                                (menu ☰ → QR &amp; Kiosque). Chaque table peut aussi avoir son propre QR code.
+                            </p>
+                        </page>
+                        <page string="Paiement &amp; caisse" name="payments">
+                            <group>
+                                <group string="Modes de paiement acceptés">
+                                    <field name="payment_method_ids" widget="many2many_tags" nolabel="1" colspan="2"/>
+                                    <field name="cash_denominations"/>
+                                </group>
+                                <group string="Contrôles">
+                                    <field name="max_cash_difference"/>
+                                    <field name="blind_closing" widget="boolean_toggle"/>
+                                    <field name="approve_discount_above"/>
+                                    <field name="approve_refund" widget="boolean_toggle"/>
+                                    <field name="approve_void" widget="boolean_toggle"/>
+                                </group>
+                            </group>
+                            <p class="text-muted">
+                                Pour relier un TPE, du Mobile Money ou une passerelle de paiement :
+                                Paramètres → Modes de paiement → « Terminal de paiement ».
+                            </p>
+                        </page>
+                        <page string="Interface" name="interface">
+                            <group>
+                                <group string="Apparence du terminal">
+                                    <field name="ui_theme"/>
+                                    <field name="big_scrollbars" widget="boolean_toggle"/>
+                                    <field name="hide_images" widget="boolean_toggle"/>
+                                    <field name="sort_cart_by_category" widget="boolean_toggle"/>
+                                </group>
+                                <group string="Catalogue">
+                                    <field name="limit_categories" widget="boolean_toggle"/>
+                                    <field name="category_ids" widget="many2many_tags" invisible="not limit_categories"/>
+                                    <field name="show_margins" widget="boolean_toggle"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Facturation" name="invoicing">
+                            <group>
+                                <group string="Factures clients">
+                                    <field name="invoice_mode"/>
+                                    <field name="walkin_partner_id" invisible="invoice_mode != 'always'"/>
+                                    <field name="invoice_journal_id" invisible="invoice_mode == 'off'"/>
+                                </group>
+                            </group>
+                            <p class="text-muted">Chaque commande encaissée génère une facture client Odoo. Le client se choisit
+                                dans la commande (recherche ou création rapide). Sans client, la facture est établie au
+                                « Client divers » : vous pourrez renseigner le vrai client plus tard, même si la caisse
+                                est fermée. Le mode de paiement <b>« À crédit »</b> laisse la facture <b>non payée</b> ;
+                                enregistrez ensuite le règlement du client en comptabilité pour la lettrer.</p>
+                        </page>
+                        <page string="Prix &amp; remises" name="pricing">
+                            <group>
+                                <group string="Remises">
+                                    <field name="line_discount_enabled" widget="boolean_toggle"/>
+                                    <field name="global_discount_enabled" widget="boolean_toggle"/>
+                                </group>
+                                <group string="Modification des prix">
+                                    <field name="allow_price_change" widget="boolean_toggle"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Tickets &amp; impression" name="printing">
+                            <group>
+                                <group string="Ticket de caisse">
+                                    <field name="receipt_header"/>
+                                    <field name="receipt_footer"/>
+                                    <field name="order_prefix" placeholder="CMD"/>
+                                    <field name="auto_print_receipt" widget="boolean_toggle"/>
+                                </group>
+                                <group string="Imprimantes &amp; matériel">
+                                    <field name="printer_ids" widget="many2many_tags"/>
+                                    <field name="print_kitchen_on_send" widget="boolean_toggle"/>
+                                    <field name="customer_display" widget="boolean_toggle"/>
+                                    <field name="customer_display_url" widget="CopyClipboardChar" invisible="not customer_display"/>
+                                </group>
+                            </group>
+                            <p class="text-muted">
+                                Ajoutez vos imprimantes dans Paramètres → Imprimantes &amp; matériel. Sans
+                                imprimante configurée, l'impression passe par le navigateur (toute imprimante installée).
+                            </p>
+                        </page>
+                        <page string="Préparation" name="kitchen">
+                            <group>
+                                <field name="station_ids" widget="many2many_tags"
+                                       options="{'color_field': 'color'}"/>
+                                <field name="quick_note_ids" widget="many2many_tags"/>
+                            </group>
+                        </page>
+                        <page string="Sonneries" name="rings">
+                            <group>
+                                <group string="Choix des sonneries">
+                                    <field name="ring_order"/>
+                                    <field name="ring_ready"/>
+                                    <field name="ring_volume"/>
+                                    <field name="ring_alarm_seconds"/>
+                                    <field name="ring_repeat"/>
+                                </group>
+                                <group string="Importer ma propre sonnerie (depuis mon ordinateur)">
+                                    <field name="ring_custom_order_name" invisible="1"/>
+                                    <field name="ring_custom_ready_name" invisible="1"/>
+                                    <field name="ring_custom_order" filename="ring_custom_order_name"/>
+                                    <field name="ring_custom_ready" filename="ring_custom_ready_name"/>
+                                    <div colspan="2" class="text-muted">
+                                        Importez un fichier mp3, wav, ogg ou m4a (2 Mo maximum), puis choisissez
+                                        « 11. Ma sonnerie (fichier importé) » dans la liste ci-dessus.
+                                    </div>
+                                </group>
+                                <group string="Écouter">
+                                    <button name="action_listen_ring" type="object" context="{'ring': False}"
+                                            string="▶ Écouter « nouveau ticket »" class="btn-primary mb-2"/>
+                                    <button name="action_listen_ready" type="object"
+                                            string="▶ Écouter « plat prêt »" class="btn-primary mb-2"/>
+                                </group>
+                            </group>
+                            <p class="text-muted">
+                                10 sonneries distinctes au choix. Vous pouvez en changer à tout moment : l'écran
+                                de préparation et le terminal prennent le nouveau choix au prochain rechargement de la page.
+                                Cliquez sur une sonnerie pour l'écouter (le son joue sur l'appareil que vous utilisez).
+                            </p>
+                            <div>
+                                <button name="action_listen_ring" type="object" context="{'ring': 'cloche'}" string="▶ 1. Cloche classique" class="btn-secondary me-2 mb-2"/>
+                                <button name="action_listen_ring" type="object" context="{'ring': 'ding'}" string="▶ 2. Ding-dong" class="btn-secondary me-2 mb-2"/>
+                                <button name="action_listen_ring" type="object" context="{'ring': 'carillon'}" string="▶ 3. Carillon" class="btn-secondary me-2 mb-2"/>
+                                <button name="action_listen_ring" type="object" context="{'ring': 'gong'}" string="▶ 4. Gong" class="btn-secondary me-2 mb-2"/>
+                                <button name="action_listen_ring" type="object" context="{'ring': 'bips'}" string="▶ 5. Bips rapides" class="btn-secondary me-2 mb-2"/>
+                                <button name="action_listen_ring" type="object" context="{'ring': 'alarme'}" string="▶ 6. Alarme" class="btn-secondary me-2 mb-2"/>
+                                <button name="action_listen_ring" type="object" context="{'ring': 'xylophone'}" string="▶ 7. Xylophone" class="btn-secondary me-2 mb-2"/>
+                                <button name="action_listen_ring" type="object" context="{'ring': 'fanfare'}" string="▶ 8. Fanfare" class="btn-secondary me-2 mb-2"/>
+                                <button name="action_listen_ring" type="object" context="{'ring': 'coucou'}" string="▶ 9. Coucou" class="btn-secondary me-2 mb-2"/>
+                                <button name="action_listen_ring" type="object" context="{'ring': 'telephone'}" string="▶ 10. Téléphone" class="btn-secondary me-2 mb-2"/>
+                            </div>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_adk_pos_config" model="ir.actions.act_window">
+        <field name="name">Points de vente</field>
+        <field name="res_model">adk.pos.config</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html"><p class="o_view_nocontent_smiling_face">Créez votre premier point de vente (Restaurant, Café, Bar, Retail...)</p></field>
+    </record>
+
+    <!-- ===== Postes de préparation ===== -->
+    <record id="view_adk_pos_station_list" model="ir.ui.view">
+        <field name="name">adk.pos.station.list</field>
+        <field name="model">adk.pos.station</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="pos_type" optional="show"/>
+                <field name="config_ids" widget="many2many_tags"/>
+                <field name="category_ids" widget="many2many_tags"/>
+                <field name="user_ids" widget="many2many_tags" optional="show" placeholder="Tout le personnel"/>
+                <field name="color" widget="color_picker" optional="hide"/>
+                <field name="active" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_adk_pos_station" model="ir.actions.act_window">
+        <field name="name">Postes de préparation</field>
+        <field name="res_model">adk.pos.station</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html"><p class="o_view_nocontent_smiling_face">
+            Créez vos postes (Cuisine, Bar, Pâtisserie…) et indiquez les catégories de produits préparées par chacun :
+            chaque commande envoyée s'affichera automatiquement sur l'écran du bon poste.
+        </p></field>
+    </record>
+
+    <!-- ===== Notes rapides ===== -->
+    <record id="view_adk_pos_quick_note_list" model="ir.ui.view">
+        <field name="name">adk.pos.quick.note.list</field>
+        <field name="model">adk.pos.quick.note</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="active" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_adk_pos_quick_note" model="ir.actions.act_window">
+        <field name="name">Notes rapides</field>
+        <field name="res_model">adk.pos.quick.note</field>
+        <field name="view_mode">list</field>
+    </record>
+
+</odoo>

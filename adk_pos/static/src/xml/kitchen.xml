@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="adk_pos.Kitchen">
+        <div t-attf-class="adk_kitchen #{state.flash ? 'adk_k_flash' : ''}" t-translation="off">
+            <div class="adk_k_top">
+                <h2><i class="fa fa-fire"/> Écrans de préparation</h2>
+                <select class="adk_input adk_k_select" t-on-change="onConfigChange">
+                    <option t-foreach="state.configs" t-as="cfg" t-key="cfg.id" t-att-value="cfg.id"
+                            t-att-selected="cfg.id === state.configId" t-esc="cfg.name"/>
+                </select>
+                <div class="adk_k_stations">
+                    <button t-if="state.stations.length !== 1" t-attf-class="adk_chip #{!state.stationId ? 'active' : ''}" t-on-click="() => this.selectStation(false)">Tous les postes</button>
+                    <button t-foreach="state.stations" t-as="st" t-key="st.id"
+                            t-attf-class="adk_chip #{state.stationId === st.id ? 'active' : ''}"
+                            t-on-click="() => this.selectStation(st.id)"><span t-attf-class="adk_st_dot adk_st_#{st.color}"/> <t t-esc="st.name"/></button>
+                </div>
+                <div class="adk_tab_spacer"/>
+                <button class="adk_btn adk_btn_small" t-on-click="testSound"><i class="fa fa-bell"/> Tester la sonnerie</button>
+                <button class="adk_icon_btn" t-on-click="toggleSound" title="Alerte sonore">
+                    <i t-attf-class="fa #{state.sound ? 'fa-volume-up' : 'fa-volume-off'}"/>
+                </button>
+                <button t-if="pendingTickets.length" class="adk_btn adk_btn_primary adk_k_recu_all" t-on-click="receiveAll">
+                    <i class="fa fa-bell-slash"/> Tout marquer « J'ai vu » (<t t-esc="pendingTickets.length"/>)
+                </button>
+                <span class="adk_pill"><t t-esc="state.tickets.length"/> ticket(s)</span>
+            </div>
+
+            <div t-if="state.audioBlocked" class="adk_k_unlock" t-on-click="unlockAudio">
+                <i class="fa fa-bell fa-2x"/> TOUCHEZ ICI POUR ACTIVER LA SONNERIE
+                <div>Le navigateur bloque le son tant que vous n'avez pas touché l'écran une fois.</div>
+            </div>
+            <div class="adk_k_board">
+                <div t-foreach="groups" t-as="grp" t-key="grp.id" t-attf-class="adk_k_group adk_st_#{grp.color}">
+                    <div class="adk_k_group_head">
+                        <div class="adk_k_group_title"><i class="fa fa-cutlery"/> <t t-esc="grp.name"/>
+                            <span class="adk_pill"><t t-esc="grp.tickets.length"/> ticket(s)</span></div>
+                        <div class="adk_k_group_cats" t-if="grp.categories.length">
+                            <span t-foreach="grp.categories" t-as="cn" t-key="cn" class="adk_k_cat" t-esc="cn"/>
+                        </div>
+                    </div>
+                    <div class="adk_k_group_body">
+                <div t-foreach="grp.tickets" t-as="ticket" t-key="ticket.key" t-attf-class="adk_k_ticket #{ticketClass(ticket)}">
+                    <div class="adk_k_head">
+                        <div>
+                            <strong class="adk_k_table">
+                                <t t-if="ticket.table">Table <t t-esc="ticket.table"/></t>
+                                <t t-else="" t-esc="ticket.order_type"/>
+                            </strong>
+                            <div class="adk_hint"><t t-esc="ticket.order_name"/> · envoi n°<t t-esc="ticket.batch_no"/> · <t t-esc="ticket.server"/></div>
+                        </div>
+                        <div class="adk_k_time"><i class="fa fa-clock-o"/> <t t-esc="ticket.sent_min"/> min</div>
+                    </div>
+                    <button t-if="ticket.state !== 'cancelled' and !ticket.received" class="adk_btn adk_btn_big adk_k_recu" t-on-click="() => this.receiveTicket(ticket)">
+                        <i class="fa fa-check"/> J'AI VU — arrêter la sonnerie
+                    </button>
+                    <div class="adk_k_note" t-if="ticket.note"><i class="fa fa-sticky-note-o"/> <t t-esc="ticket.note"/></div>
+                    <div class="adk_k_items">
+                        <div t-foreach="ticket.items" t-as="item" t-key="item.id" t-attf-class="adk_k_item adk_ki_#{item.state}">
+                            <div class="adk_k_item_main">
+                                <strong><t t-if="item.state === 'cancelled'">ANNULÉ — </t><t t-esc="item.qty"/> ×</strong> <t t-esc="item.name"/>
+                                <span class="adk_k_cat adk_k_cat_small" t-if="item.categ" t-esc="item.categ"/>
+                                <div class="adk_k_item_note" t-if="item.note"><t t-esc="item.note"/></div>
+                            </div>
+                            <div class="adk_k_item_actions" t-if="item.state !== 'cancelled'">
+                                <button t-if="item.state === 'new'" class="adk_btn adk_btn_small" t-on-click="() => this.setItem(item, 'preparing')">Préparer</button>
+                                <button t-if="item.state === 'new' or item.state === 'preparing'" class="adk_btn adk_btn_small adk_btn_green" t-on-click="() => this.setItem(item, 'ready')">Prêt</button>
+                                <span t-if="item.state === 'ready'" class="adk_pill adk_pill_green">Prêt ✓</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="adk_k_foot">
+                        <button t-if="ticket.state !== 'ready' and ticket.state !== 'cancelled'" class="adk_btn adk_btn_green" t-on-click="() => this.setTicket(ticket, 'ready')">Tout prêt</button>
+                        <button t-if="ticket.state === 'ready'" class="adk_btn adk_btn_primary" t-on-click="() => this.bumpTicket(ticket)">Servi ✓</button>
+                        <button t-if="ticket.state === 'cancelled'" class="adk_btn adk_btn_danger" t-on-click="() => this.ackCancel(ticket)">J'ai vu l'annulation</button>
+                    </div>
+                </div>
+                        <div t-if="!grp.tickets.length" class="adk_k_group_empty"><i class="fa fa-check-circle"/> Rien à préparer ici.</div>
+                    </div>
+                </div>
+                <div t-if="!groups.length and !state.loading" class="adk_empty adk_k_empty">
+                    <i class="fa fa-check-circle fa-3x"/>
+                    <div>Aucune commande en attente.</div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

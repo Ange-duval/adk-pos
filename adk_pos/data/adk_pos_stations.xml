@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="station_restaurant_cuisine" model="adk.pos.station">
+            <field name="name">Cuisine</field>
+            <field name="pos_type">restaurant</field>
+            <field name="color">2</field>
+            <field name="sequence">1</field>
+            <field name="category_ids" eval="[(6, 0, [ref('categ_restaurant_entrees'), ref('categ_restaurant_plats'), ref('categ_restaurant_grillades'), ref('categ_restaurant_desserts')])]"/>
+        </record>
+        <record id="station_restaurant_bar" model="adk.pos.station">
+            <field name="name">Bar</field>
+            <field name="pos_type">restaurant</field>
+            <field name="color">4</field>
+            <field name="sequence">2</field>
+            <field name="category_ids" eval="[(6, 0, [ref('categ_restaurant_fraiches'), ref('categ_restaurant_chaudes'), ref('categ_restaurant_bieres')])]"/>
+        </record>
+        <record id="station_cafe_bar" model="adk.pos.station">
+            <field name="name">Bar</field>
+            <field name="pos_type">cafe</field>
+            <field name="color">4</field>
+            <field name="sequence">1</field>
+            <field name="category_ids" eval="[(6, 0, [ref('categ_cafe_cafes'), ref('categ_cafe_thes'), ref('categ_cafe_fraiches')])]"/>
+        </record>
+        <record id="station_cafe_snacking" model="adk.pos.station">
+            <field name="name">Pâtisserie &amp; snacking</field>
+            <field name="pos_type">cafe</field>
+            <field name="color">2</field>
+            <field name="sequence">2</field>
+            <field name="category_ids" eval="[(6, 0, [ref('categ_cafe_viennoiseries'), ref('categ_cafe_gateaux'), ref('categ_cafe_sale')])]"/>
+        </record>
+        <record id="station_bar_bar" model="adk.pos.station">
+            <field name="name">Bar</field>
+            <field name="pos_type">bar</field>
+            <field name="color">4</field>
+            <field name="sequence">1</field>
+            <field name="category_ids" eval="[(6, 0, [ref('categ_bar_cocktails'), ref('categ_bar_bieres'), ref('categ_bar_vins'), ref('categ_bar_softs')])]"/>
+        </record>
+        <record id="station_bar_snack" model="adk.pos.station">
+            <field name="name">Snack</field>
+            <field name="pos_type">bar</field>
+            <field name="color">2</field>
+            <field name="sequence">2</field>
+            <field name="category_ids" eval="[(6, 0, [ref('categ_bar_snacks')])]"/>
+        </record>
+        <record id="station_fastfood_cuisine" model="adk.pos.station">
+            <field name="name">Cuisine</field>
+            <field name="pos_type">fastfood</field>
+            <field name="color">2</field>
+            <field name="sequence">1</field>
+            <field name="category_ids" eval="[(6, 0, [ref('categ_fastfood_burgers'), ref('categ_fastfood_wraps'), ref('categ_fastfood_accomp')])]"/>
+        </record>
+        <record id="station_fastfood_comptoir" model="adk.pos.station">
+            <field name="name">Comptoir</field>
+            <field name="pos_type">fastfood</field>
+            <field name="color">4</field>
+            <field name="sequence">2</field>
+            <field name="category_ids" eval="[(6, 0, [ref('categ_fastfood_desserts'), ref('categ_fastfood_boissons')])]"/>
+        </record>
+    </data>
+</odoo>

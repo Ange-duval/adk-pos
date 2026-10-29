@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============ PRODUITS : champs ADK ajoutés à la fiche produit native ============ -->
+    <record id="view_product_template_form_adk_pos" model="ir.ui.view">
+        <field name="name">product.template.form.adk.pos</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='categ_id']" position="after">
+                <field name="adk_pos_course"/>
+                <field name="adk_pos_favorite"/>
+                <field name="adk_pos_config_ids" widget="many2many_tags"
+                       placeholder="Tous les points de vente si vide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_adk_pos_product" model="ir.actions.act_window">
+        <field name="name">Produits</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="context">{'default_sale_ok': True}</field>
+        <field name="domain">[('sale_ok', '=', True)]</field>
+        <field name="help" type="html"><p class="o_view_nocontent_smiling_face">Créez votre premier produit.</p></field>
+    </record>
+
+    <!-- ============ CATÉGORIES DE PRODUITS ============ -->
+    <record id="view_adk_pos_product_category_list" model="ir.ui.view">
+        <field name="name">adk.pos.product.category.list</field>
+        <field name="model">product.category</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="name"/>
+                <field name="parent_id"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_adk_pos_product_category" model="ir.actions.act_window">
+        <field name="name">Catégories de produits</field>
+        <field name="res_model">product.category</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- ============ COMBOS / MENUS ============ -->
+    <record id="view_adk_pos_combo_list" model="ir.ui.view">
+        <field name="name">adk.pos.combo.list</field>
+        <field name="model">adk.pos.combo</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="price" widget="monetary"/>
+                <field name="adk_pos_config_ids" widget="many2many_tags"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_adk_pos_combo_form" model="ir.ui.view">
+        <field name="name">adk.pos.combo.form</field>
+        <field name="model">adk.pos.combo</field>
+        <field name="arch" type="xml">
+            <form string="Combo / Menu">
+                <sheet>
+                    <field name="image_1920" widget="image" class="oe_avatar"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Ex: Menu Découverte"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="price"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="adk_pos_config_ids" widget="many2many_tags"
+                                   placeholder="Tous les points de vente si vide"/>
+                            <field name="product_id" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Produits inclus">
+                            <field name="combo_line_ids">
+                                <list editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="qty"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_adk_pos_combo" model="ir.actions.act_window">
+        <field name="name">Combos / Menus</field>
+        <field name="res_model">adk.pos.combo</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html"><p class="o_view_nocontent_smiling_face">
+            Créez un menu à prix fixe regroupant plusieurs produits (ex: Plat + Boisson + Dessert).
+        </p></field>
+    </record>
+
+</odoo>

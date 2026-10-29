@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_adk_pos_root" name="ADK Point de Vente" web_icon="adk_pos,static/description/icon.png"
+              sequence="10"/>
+
+    <menuitem id="menu_adk_pos_terminal" name="Point de Vente" parent="menu_adk_pos_root"
+              action="action_adk_pos_terminal" sequence="0"/>
+    <menuitem id="menu_adk_pos_kitchen" name="Écran cuisine" parent="menu_adk_pos_root"
+              action="action_adk_pos_kitchen" sequence="1"/>
+    <menuitem id="menu_adk_pos_dashboard" name="Dashboard" parent="menu_adk_pos_root"
+              action="action_adk_pos_dashboard" sequence="2"
+              groups="adk_pos.group_adk_pos_cashier"/>
+
+    <menuitem id="menu_adk_pos_commandes_root" name="Commandes" parent="menu_adk_pos_root" sequence="3"
+              groups="adk_pos.group_adk_pos_cashier"/>
+    <menuitem id="menu_adk_pos_orders" name="Toutes les commandes" parent="menu_adk_pos_commandes_root"
+              action="action_adk_pos_order" sequence="1"/>
+    <menuitem id="menu_adk_pos_payments" name="Paiements" parent="menu_adk_pos_commandes_root"
+              action="action_adk_pos_payment" sequence="2"/>
+    <menuitem id="menu_adk_pos_sessions" name="Sessions de caisse" parent="menu_adk_pos_commandes_root"
+              action="action_adk_pos_session" sequence="3"/>
+
+    <menuitem id="menu_adk_pos_salle_root" name="Salle" parent="menu_adk_pos_root" sequence="4"/>
+    <menuitem id="menu_adk_pos_reservations" name="Réservations" parent="menu_adk_pos_salle_root"
+              action="action_adk_pos_reservation" sequence="1"/>
+    <menuitem id="menu_adk_pos_tables" name="Tables" parent="menu_adk_pos_salle_root"
+              action="action_adk_pos_table" sequence="2"/>
+    <menuitem id="menu_adk_pos_floors" name="Salles" parent="menu_adk_pos_salle_root"
+              action="action_adk_pos_floor" sequence="3"
+              groups="adk_pos.group_adk_pos_manager"/>
+
+    <menuitem id="menu_adk_pos_analyse_root" name="Analyse" parent="menu_adk_pos_root" sequence="5"
+              groups="adk_pos.group_adk_pos_cashier"/>
+    <menuitem id="menu_adk_pos_analysis_sales" name="Ventes" parent="menu_adk_pos_analyse_root"
+              action="action_adk_pos_analysis" sequence="1"/>
+    <menuitem id="menu_adk_pos_analysis_products" name="Produits" parent="menu_adk_pos_analyse_root"
+              action="action_adk_pos_analysis_products" sequence="2"/>
+    <menuitem id="menu_adk_pos_analysis_kitchen" name="Temps de préparation" parent="menu_adk_pos_analyse_root"
+              action="action_adk_pos_kitchen_items" sequence="3"/>
+    <menuitem id="menu_adk_pos_reports" name="Rapports X / Z (sessions)" parent="menu_adk_pos_analyse_root"
+              action="action_adk_pos_session" sequence="4"/>
+
+    <menuitem id="menu_adk_pos_configuration_root" name="Paramètres" parent="menu_adk_pos_root" sequence="6"
+              groups="adk_pos.group_adk_pos_manager"/>
+    <menuitem id="menu_adk_pos_setup" name="Assistant de démarrage" parent="menu_adk_pos_configuration_root"
+              action="action_adk_pos_setup_wizard" sequence="0"/>
+    <menuitem id="menu_adk_pos_config" name="Points de vente (réglages)" parent="menu_adk_pos_configuration_root"
+              action="action_adk_pos_config" sequence="1"/>
+    <menuitem id="menu_adk_pos_product" name="Produits" parent="menu_adk_pos_configuration_root"
+              action="action_adk_pos_product" sequence="2"/>
+    <menuitem id="menu_adk_pos_product_category" name="Catégories de produits" parent="menu_adk_pos_configuration_root"
+              action="action_adk_pos_product_category" sequence="3"/>
+    <menuitem id="menu_adk_pos_combo" name="Combos / Menus" parent="menu_adk_pos_configuration_root"
+              action="action_adk_pos_combo" sequence="4"/>
+    <menuitem id="menu_adk_pos_station" name="Postes de préparation" parent="menu_adk_pos_configuration_root"
+              action="action_adk_pos_station" sequence="5"/>
+    <menuitem id="menu_adk_pos_quick_note" name="Notes rapides" parent="menu_adk_pos_configuration_root"
+              action="action_adk_pos_quick_note" sequence="6"/>
+    <menuitem id="menu_adk_pos_payment_method" name="Modes de paiement" parent="menu_adk_pos_configuration_root"
+              action="action_adk_pos_payment_method" sequence="7"/>
+    <menuitem id="menu_adk_pos_printer" name="Imprimantes &amp; matériel" parent="menu_adk_pos_configuration_root"
+              action="action_adk_pos_printer" sequence="7"/>
+    <menuitem id="menu_adk_pos_users_pin" name="Codes PIN collaborateurs" parent="menu_adk_pos_configuration_root"
+              action="action_adk_pos_users_pin" sequence="8"/>
+    <menuitem id="menu_adk_pos_new_employee" name="Nouveau membre du personnel" parent="menu_adk_pos_configuration_root"
+              action="action_adk_pos_employee_wizard" sequence="9"/>
+
+</odoo>

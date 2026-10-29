@@ -1,0 +1,917 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="prod_restaurant_brochettes" model="product.template">
+            <field name="name">Brochettes de bœuf</field>
+            <field name="categ_id" ref="categ_restaurant_entrees"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">8.0</field>
+            <field name="standard_price">2.8</field>
+            <field name="adk_pos_course">starter</field>
+            <field name="adk_pos_favorite" eval="True"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/restaurant_brochettes.jpg"/>
+        </record>
+        <record id="prod_restaurant_steak" model="product.template">
+            <field name="name">Steak frites</field>
+            <field name="categ_id" ref="categ_restaurant_plats"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">15.0</field>
+            <field name="standard_price">5.25</field>
+            <field name="adk_pos_course">main</field>
+            <field name="adk_pos_favorite" eval="True"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/restaurant_steak.jpg"/>
+        </record>
+        <record id="prod_restaurant_pizza" model="product.template">
+            <field name="name">Pizza margherita</field>
+            <field name="categ_id" ref="categ_restaurant_plats"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">11.0</field>
+            <field name="standard_price">3.85</field>
+            <field name="adk_pos_course">main</field>
+            <field name="adk_pos_favorite" eval="True"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/restaurant_pizza.jpg"/>
+        </record>
+        <record id="prod_restaurant_poulet" model="product.template">
+            <field name="name">Poulet braisé</field>
+            <field name="categ_id" ref="categ_restaurant_grillades"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">12.5</field>
+            <field name="standard_price">4.38</field>
+            <field name="adk_pos_course">main</field>
+            <field name="adk_pos_favorite" eval="True"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/restaurant_poulet.jpg"/>
+        </record>
+        <record id="prod_restaurant_gateau" model="product.template">
+            <field name="name">Gâteau au chocolat</field>
+            <field name="categ_id" ref="categ_restaurant_desserts"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">5.5</field>
+            <field name="standard_price">1.92</field>
+            <field name="adk_pos_course">dessert</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/restaurant_gateau.jpg"/>
+        </record>
+        <record id="prod_restaurant_eau" model="product.template">
+            <field name="name">Eau minérale</field>
+            <field name="categ_id" ref="categ_restaurant_fraiches"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">1.5</field>
+            <field name="standard_price">0.52</field>
+            <field name="adk_pos_course">drink</field>
+            <field name="adk_pos_favorite" eval="True"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/restaurant_eau.jpg"/>
+        </record>
+        <record id="prod_restaurant_jus" model="product.template">
+            <field name="name">Jus d'orange</field>
+            <field name="categ_id" ref="categ_restaurant_fraiches"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">3.5</field>
+            <field name="standard_price">1.22</field>
+            <field name="adk_pos_course">drink</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/restaurant_jus.jpg"/>
+        </record>
+        <record id="prod_restaurant_cafe" model="product.template">
+            <field name="name">Café</field>
+            <field name="categ_id" ref="categ_restaurant_chaudes"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">2.0</field>
+            <field name="standard_price">0.7</field>
+            <field name="adk_pos_course">drink</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/restaurant_cafe.jpg"/>
+        </record>
+        <record id="prod_restaurant_biere" model="product.template">
+            <field name="name">Bière pression</field>
+            <field name="categ_id" ref="categ_restaurant_bieres"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">3.5</field>
+            <field name="standard_price">1.22</field>
+            <field name="adk_pos_course">drink</field>
+            <field name="adk_pos_favorite" eval="True"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/restaurant_biere.jpg"/>
+        </record>
+        <record id="prod_restaurant_vin_rouge" model="product.template">
+            <field name="name">Verre de vin rouge</field>
+            <field name="categ_id" ref="categ_restaurant_bieres"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">4.5</field>
+            <field name="standard_price">1.57</field>
+            <field name="adk_pos_course">drink</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/restaurant_vin_rouge.jpg"/>
+        </record>
+        <record id="prod_cafe_espresso" model="product.template">
+            <field name="name">Espresso</field>
+            <field name="categ_id" ref="categ_cafe_cafes"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">2.0</field>
+            <field name="standard_price">0.7</field>
+            <field name="adk_pos_course">drink</field>
+            <field name="adk_pos_favorite" eval="True"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/cafe_espresso.jpg"/>
+        </record>
+        <record id="prod_cafe_cappuccino" model="product.template">
+            <field name="name">Cappuccino</field>
+            <field name="categ_id" ref="categ_cafe_cafes"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">3.2</field>
+            <field name="standard_price">1.12</field>
+            <field name="adk_pos_course">drink</field>
+            <field name="adk_pos_favorite" eval="True"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/cafe_cappuccino.jpg"/>
+        </record>
+        <record id="prod_cafe_the_vert" model="product.template">
+            <field name="name">Thé vert</field>
+            <field name="categ_id" ref="categ_cafe_thes"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">2.8</field>
+            <field name="standard_price">0.98</field>
+            <field name="adk_pos_course">drink</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/cafe_the_vert.jpg"/>
+        </record>
+        <record id="prod_cafe_jus" model="product.template">
+            <field name="name">Jus pressé</field>
+            <field name="categ_id" ref="categ_cafe_fraiches"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">4.5</field>
+            <field name="standard_price">1.57</field>
+            <field name="adk_pos_course">drink</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/cafe_jus.jpg"/>
+        </record>
+        <record id="prod_cafe_limonade" model="product.template">
+            <field name="name">Limonade maison</field>
+            <field name="categ_id" ref="categ_cafe_fraiches"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">3.8</field>
+            <field name="standard_price">1.33</field>
+            <field name="adk_pos_course">drink</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/cafe_limonade.jpg"/>
+        </record>
+        <record id="prod_cafe_croissant" model="product.template">
+            <field name="name">Croissant</field>
+            <field name="categ_id" ref="categ_cafe_viennoiseries"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">1.8</field>
+            <field name="standard_price">0.63</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="True"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/cafe_croissant.jpg"/>
+        </record>
+        <record id="prod_cafe_muffin" model="product.template">
+            <field name="name">Muffin</field>
+            <field name="categ_id" ref="categ_cafe_gateaux"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">3.0</field>
+            <field name="standard_price">1.05</field>
+            <field name="adk_pos_course">dessert</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/cafe_muffin.jpg"/>
+        </record>
+        <record id="prod_cafe_cheesecake" model="product.template">
+            <field name="name">Cheesecake</field>
+            <field name="categ_id" ref="categ_cafe_gateaux"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">5.0</field>
+            <field name="standard_price">1.75</field>
+            <field name="adk_pos_course">dessert</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/cafe_cheesecake.jpg"/>
+        </record>
+        <record id="prod_cafe_sandwich" model="product.template">
+            <field name="name">Sandwich jambon-fromage</field>
+            <field name="categ_id" ref="categ_cafe_sale"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">5.5</field>
+            <field name="standard_price">1.92</field>
+            <field name="adk_pos_course">main</field>
+            <field name="adk_pos_favorite" eval="True"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/cafe_sandwich.jpg"/>
+        </record>
+        <record id="prod_cafe_croque" model="product.template">
+            <field name="name">Croque-monsieur</field>
+            <field name="categ_id" ref="categ_cafe_sale"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">6.0</field>
+            <field name="standard_price">2.1</field>
+            <field name="adk_pos_course">main</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/cafe_croque.jpg"/>
+        </record>
+        <record id="prod_bar_mojito" model="product.template">
+            <field name="name">Mojito</field>
+            <field name="categ_id" ref="categ_bar_cocktails"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">8.0</field>
+            <field name="standard_price">2.8</field>
+            <field name="adk_pos_course">drink</field>
+            <field name="adk_pos_favorite" eval="True"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/bar_mojito.jpg"/>
+        </record>
+        <record id="prod_bar_margarita" model="product.template">
+            <field name="name">Margarita</field>
+            <field name="categ_id" ref="categ_bar_cocktails"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">8.5</field>
+            <field name="standard_price">2.97</field>
+            <field name="adk_pos_course">drink</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/bar_margarita.jpg"/>
+        </record>
+        <record id="prod_bar_pression25" model="product.template">
+            <field name="name">Pression 25 cl</field>
+            <field name="categ_id" ref="categ_bar_bieres"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">3.0</field>
+            <field name="standard_price">1.05</field>
+            <field name="adk_pos_course">drink</field>
+            <field name="adk_pos_favorite" eval="True"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/bar_pression25.jpg"/>
+        </record>
+        <record id="prod_bar_whisky" model="product.template">
+            <field name="name">Whisky</field>
+            <field name="categ_id" ref="categ_bar_vins"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">7.0</field>
+            <field name="standard_price">2.45</field>
+            <field name="adk_pos_course">drink</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/bar_whisky.jpg"/>
+        </record>
+        <record id="prod_bar_coca" model="product.template">
+            <field name="name">Soda</field>
+            <field name="categ_id" ref="categ_bar_softs"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">2.5</field>
+            <field name="standard_price">0.88</field>
+            <field name="adk_pos_course">drink</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/bar_coca.jpg"/>
+        </record>
+        <record id="prod_bar_cacahuetes" model="product.template">
+            <field name="name">Cacahuètes</field>
+            <field name="categ_id" ref="categ_bar_snacks"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">2.0</field>
+            <field name="standard_price">0.7</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/bar_cacahuetes.jpg"/>
+        </record>
+        <record id="prod_bar_planche" model="product.template">
+            <field name="name">Planche apéro</field>
+            <field name="categ_id" ref="categ_bar_snacks"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">12.0</field>
+            <field name="standard_price">4.2</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="True"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/bar_planche.jpg"/>
+        </record>
+        <record id="prod_bar_ailes" model="product.template">
+            <field name="name">Ailes de poulet</field>
+            <field name="categ_id" ref="categ_bar_snacks"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">7.5</field>
+            <field name="standard_price">2.62</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/bar_ailes.jpg"/>
+        </record>
+        <record id="prod_bar_nuggets" model="product.template">
+            <field name="name">Nuggets de poulet x6</field>
+            <field name="categ_id" ref="categ_bar_snacks"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">6.5</field>
+            <field name="standard_price">2.27</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/bar_nuggets.jpg"/>
+        </record>
+        <record id="prod_bar_rings" model="product.template">
+            <field name="name">Oignons frits</field>
+            <field name="categ_id" ref="categ_bar_snacks"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">5.0</field>
+            <field name="standard_price">1.75</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/bar_rings.jpg"/>
+        </record>
+        <record id="prod_fastfood_cheese" model="product.template">
+            <field name="name">Cheeseburger</field>
+            <field name="categ_id" ref="categ_fastfood_burgers"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">5.5</field>
+            <field name="standard_price">1.92</field>
+            <field name="adk_pos_course">main</field>
+            <field name="adk_pos_favorite" eval="True"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/fastfood_cheese.jpg"/>
+        </record>
+        <record id="prod_fastfood_double" model="product.template">
+            <field name="name">Double burger</field>
+            <field name="categ_id" ref="categ_fastfood_burgers"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">7.5</field>
+            <field name="standard_price">2.62</field>
+            <field name="adk_pos_course">main</field>
+            <field name="adk_pos_favorite" eval="True"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/fastfood_double.jpg"/>
+        </record>
+        <record id="prod_fastfood_wrap" model="product.template">
+            <field name="name">Wrap poulet</field>
+            <field name="categ_id" ref="categ_fastfood_wraps"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">6.0</field>
+            <field name="standard_price">2.1</field>
+            <field name="adk_pos_course">main</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/fastfood_wrap.jpg"/>
+        </record>
+        <record id="prod_fastfood_tacos" model="product.template">
+            <field name="name">Tacos</field>
+            <field name="categ_id" ref="categ_fastfood_wraps"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">6.5</field>
+            <field name="standard_price">2.27</field>
+            <field name="adk_pos_course">main</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/fastfood_tacos.jpg"/>
+        </record>
+        <record id="prod_fastfood_frites" model="product.template">
+            <field name="name">Frites</field>
+            <field name="categ_id" ref="categ_fastfood_accomp"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">2.5</field>
+            <field name="standard_price">0.88</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="True"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/fastfood_frites.jpg"/>
+        </record>
+        <record id="prod_fastfood_sundae" model="product.template">
+            <field name="name">Sundae</field>
+            <field name="categ_id" ref="categ_fastfood_desserts"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">3.5</field>
+            <field name="standard_price">1.22</field>
+            <field name="adk_pos_course">dessert</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/fastfood_sundae.jpg"/>
+        </record>
+        <record id="prod_fastfood_donut" model="product.template">
+            <field name="name">Donut</field>
+            <field name="categ_id" ref="categ_fastfood_desserts"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">2.0</field>
+            <field name="standard_price">0.7</field>
+            <field name="adk_pos_course">dessert</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/fastfood_donut.jpg"/>
+        </record>
+        <record id="prod_fastfood_soda" model="product.template">
+            <field name="name">Soda</field>
+            <field name="categ_id" ref="categ_fastfood_boissons"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">2.5</field>
+            <field name="standard_price">0.88</field>
+            <field name="adk_pos_course">drink</field>
+            <field name="adk_pos_favorite" eval="True"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/fastfood_soda.jpg"/>
+        </record>
+        <record id="prod_fastfood_milkshake" model="product.template">
+            <field name="name">Milkshake</field>
+            <field name="categ_id" ref="categ_fastfood_boissons"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">4.0</field>
+            <field name="standard_price">1.4</field>
+            <field name="adk_pos_course">drink</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/fastfood_milkshake.jpg"/>
+        </record>
+        <record id="prod_fastfood_eau" model="product.template">
+            <field name="name">Eau minérale</field>
+            <field name="categ_id" ref="categ_fastfood_boissons"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">1.5</field>
+            <field name="standard_price">0.52</field>
+            <field name="adk_pos_course">drink</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/fastfood_eau.jpg"/>
+        </record>
+        <record id="prod_retail_riz" model="product.template">
+            <field name="name">Riz 5 kg</field>
+            <field name="categ_id" ref="categ_retail_epicerie"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">6.5</field>
+            <field name="standard_price">2.27</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="True"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/retail_riz.jpg"/>
+        </record>
+        <record id="prod_retail_huile" model="product.template">
+            <field name="name">Huile de cuisson 1 L</field>
+            <field name="categ_id" ref="categ_retail_epicerie"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">3.2</field>
+            <field name="standard_price">1.12</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/retail_huile.jpg"/>
+        </record>
+        <record id="prod_retail_pates" model="product.template">
+            <field name="name">Pâtes 500 g</field>
+            <field name="categ_id" ref="categ_retail_epicerie"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">1.2</field>
+            <field name="standard_price">0.42</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/retail_pates.jpg"/>
+        </record>
+        <record id="prod_retail_lait" model="product.template">
+            <field name="name">Lait 1 L</field>
+            <field name="categ_id" ref="categ_retail_epicerie"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">1.4</field>
+            <field name="standard_price">0.49</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="True"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/retail_lait.jpg"/>
+        </record>
+        <record id="prod_retail_pain" model="product.template">
+            <field name="name">Pain</field>
+            <field name="categ_id" ref="categ_retail_epicerie"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">0.9</field>
+            <field name="standard_price">0.32</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="True"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/retail_pain.jpg"/>
+        </record>
+        <record id="prod_retail_eau" model="product.template">
+            <field name="name">Eau 1,5 L</field>
+            <field name="categ_id" ref="categ_retail_boissons"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">0.7</field>
+            <field name="standard_price">0.24</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="True"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/retail_eau.jpg"/>
+        </record>
+        <record id="prod_retail_jus" model="product.template">
+            <field name="name">Jus de fruits 1 L</field>
+            <field name="categ_id" ref="categ_retail_boissons"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">2.2</field>
+            <field name="standard_price">0.77</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/retail_jus.jpg"/>
+        </record>
+        <record id="prod_retail_soda" model="product.template">
+            <field name="name">Soda 1,5 L</field>
+            <field name="categ_id" ref="categ_retail_boissons"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">1.8</field>
+            <field name="standard_price">0.63</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/retail_soda.jpg"/>
+        </record>
+        <record id="prod_retail_bananes" model="product.template">
+            <field name="name">Bananes 1 kg</field>
+            <field name="categ_id" ref="categ_retail_fruits"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">1.6</field>
+            <field name="standard_price">0.56</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/retail_bananes.jpg"/>
+        </record>
+        <record id="prod_retail_tomates" model="product.template">
+            <field name="name">Tomates 1 kg</field>
+            <field name="categ_id" ref="categ_retail_fruits"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">2.0</field>
+            <field name="standard_price">0.7</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/retail_tomates.jpg"/>
+        </record>
+        <record id="prod_retail_oignons" model="product.template">
+            <field name="name">Oignons 1 kg</field>
+            <field name="categ_id" ref="categ_retail_fruits"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">1.3</field>
+            <field name="standard_price">0.45</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/retail_oignons.jpg"/>
+        </record>
+        <record id="prod_retail_savon" model="product.template">
+            <field name="name">Savon</field>
+            <field name="categ_id" ref="categ_retail_hygiene"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">1.1</field>
+            <field name="standard_price">0.39</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/retail_savon.jpg"/>
+        </record>
+        <record id="prod_retail_dentifrice" model="product.template">
+            <field name="name">Dentifrice</field>
+            <field name="categ_id" ref="categ_retail_hygiene"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">2.5</field>
+            <field name="standard_price">0.88</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/retail_dentifrice.jpg"/>
+        </record>
+        <record id="prod_retail_papier" model="product.template">
+            <field name="name">Papier toilette (x6)</field>
+            <field name="categ_id" ref="categ_retail_hygiene"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">3.2</field>
+            <field name="standard_price">1.12</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/retail_papier.jpg"/>
+        </record>
+        <record id="prod_retail_piles" model="product.template">
+            <field name="name">Piles AA (x4)</field>
+            <field name="categ_id" ref="categ_retail_maison"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">3.5</field>
+            <field name="standard_price">1.22</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/retail_piles.jpg"/>
+        </record>
+        <record id="prod_retail_ampoule" model="product.template">
+            <field name="name">Ampoule LED</field>
+            <field name="categ_id" ref="categ_retail_maison"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">2.8</field>
+            <field name="standard_price">0.98</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/retail_ampoule.jpg"/>
+        </record>
+        <record id="prod_boutique_homme_tshirt" model="product.template">
+            <field name="name">T-shirt coton</field>
+            <field name="categ_id" ref="categ_boutique_homme"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">12.0</field>
+            <field name="standard_price">6.0</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="True"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/boutique_homme_tshirt.jpg"/>
+        </record>
+        <record id="prod_boutique_homme_chemise" model="product.template">
+            <field name="name">Chemise</field>
+            <field name="categ_id" ref="categ_boutique_homme"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">25.0</field>
+            <field name="standard_price">12.5</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/boutique_homme_chemise.jpg"/>
+        </record>
+        <record id="prod_boutique_homme_jean" model="product.template">
+            <field name="name">Jean slim</field>
+            <field name="categ_id" ref="categ_boutique_homme"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">35.0</field>
+            <field name="standard_price">17.5</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="True"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/boutique_homme_jean.jpg"/>
+        </record>
+        <record id="prod_boutique_homme_veste" model="product.template">
+            <field name="name">Veste légère</field>
+            <field name="categ_id" ref="categ_boutique_homme"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">60.0</field>
+            <field name="standard_price">30.0</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/boutique_homme_veste.jpg"/>
+        </record>
+        <record id="prod_boutique_homme_short" model="product.template">
+            <field name="name">Short</field>
+            <field name="categ_id" ref="categ_boutique_homme"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">18.0</field>
+            <field name="standard_price">9.0</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/boutique_homme_short.jpg"/>
+        </record>
+        <record id="prod_boutique_femme_robe" model="product.template">
+            <field name="name">Robe d&apos;été</field>
+            <field name="categ_id" ref="categ_boutique_femme"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">40.0</field>
+            <field name="standard_price">20.0</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="True"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/boutique_femme_robe.jpg"/>
+        </record>
+        <record id="prod_boutique_femme_chemisier" model="product.template">
+            <field name="name">Chemisier</field>
+            <field name="categ_id" ref="categ_boutique_femme"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">28.0</field>
+            <field name="standard_price">14.0</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/boutique_femme_chemisier.jpg"/>
+        </record>
+        <record id="prod_boutique_femme_pantalon" model="product.template">
+            <field name="name">Pantalon taille haute</field>
+            <field name="categ_id" ref="categ_boutique_femme"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">32.0</field>
+            <field name="standard_price">16.0</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/boutique_femme_pantalon.jpg"/>
+        </record>
+        <record id="prod_boutique_femme_pagne" model="product.template">
+            <field name="name">Kimono fleuri</field>
+            <field name="categ_id" ref="categ_boutique_femme"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">55.0</field>
+            <field name="standard_price">27.5</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="True"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/boutique_femme_pagne.jpg"/>
+        </record>
+        <record id="prod_boutique_femme_foulard" model="product.template">
+            <field name="name">Foulard</field>
+            <field name="categ_id" ref="categ_boutique_femme"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">10.0</field>
+            <field name="standard_price">5.0</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/boutique_femme_foulard.jpg"/>
+        </record>
+        <record id="prod_boutique_chaus_baskets" model="product.template">
+            <field name="name">Baskets</field>
+            <field name="categ_id" ref="categ_boutique_chaussures"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">45.0</field>
+            <field name="standard_price">22.5</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="True"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/boutique_chaus_baskets.jpg"/>
+        </record>
+        <record id="prod_boutique_chaus_sandales" model="product.template">
+            <field name="name">Sandales</field>
+            <field name="categ_id" ref="categ_boutique_chaussures"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">22.0</field>
+            <field name="standard_price">11.0</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/boutique_chaus_sandales.jpg"/>
+        </record>
+        <record id="prod_boutique_chaus_mocassins" model="product.template">
+            <field name="name">Mocassins</field>
+            <field name="categ_id" ref="categ_boutique_chaussures"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">50.0</field>
+            <field name="standard_price">25.0</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/boutique_chaus_mocassins.jpg"/>
+        </record>
+        <record id="prod_boutique_chaus_escarpins" model="product.template">
+            <field name="name">Escarpins</field>
+            <field name="categ_id" ref="categ_boutique_chaussures"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">48.0</field>
+            <field name="standard_price">24.0</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/boutique_chaus_escarpins.jpg"/>
+        </record>
+        <record id="prod_boutique_chaus_ballerines" model="product.template">
+            <field name="name">Ballerines</field>
+            <field name="categ_id" ref="categ_boutique_chaussures"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">30.0</field>
+            <field name="standard_price">15.0</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/boutique_chaus_ballerines.jpg"/>
+        </record>
+        <record id="prod_boutique_acc_sac" model="product.template">
+            <field name="name">Sac à main</field>
+            <field name="categ_id" ref="categ_boutique_accessoires"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">38.0</field>
+            <field name="standard_price">19.0</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="True"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/boutique_acc_sac.jpg"/>
+        </record>
+        <record id="prod_boutique_acc_portefeuille" model="product.template">
+            <field name="name">Portefeuille</field>
+            <field name="categ_id" ref="categ_boutique_accessoires"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">20.0</field>
+            <field name="standard_price">10.0</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/boutique_acc_portefeuille.jpg"/>
+        </record>
+        <record id="prod_boutique_acc_casquette" model="product.template">
+            <field name="name">Casquette</field>
+            <field name="categ_id" ref="categ_boutique_accessoires"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">12.0</field>
+            <field name="standard_price">6.0</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/boutique_acc_casquette.jpg"/>
+        </record>
+        <record id="prod_boutique_acc_lunettes" model="product.template">
+            <field name="name">Lunettes de soleil</field>
+            <field name="categ_id" ref="categ_boutique_accessoires"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">15.0</field>
+            <field name="standard_price">7.5</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="False"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/boutique_acc_lunettes.jpg"/>
+        </record>
+        <record id="prod_boutique_acc_montre" model="product.template">
+            <field name="name">Montre</field>
+            <field name="categ_id" ref="categ_boutique_accessoires"/>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="list_price">55.0</field>
+            <field name="standard_price">27.5</field>
+            <field name="adk_pos_course">other</field>
+            <field name="adk_pos_favorite" eval="True"/>
+            <field name="image_1920" type="base64" file="adk_pos/static/img/products/boutique_acc_montre.jpg"/>
+        </record>
+    </data>
+</odoo>

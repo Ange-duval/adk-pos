@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="paperformat_adk_pos_a4_report" model="report.paperformat">
+        <field name="name">ADK POS - A4 rapport</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">12</field>
+        <field name="margin_bottom">16</field>
+        <field name="margin_left">10</field>
+        <field name="margin_right">10</field>
+        <field name="header_spacing">0</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <template id="report_sales_detail" name="Détail des ventes ADK POS">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="w">
+                <t t-set="d" t-value="get_data(w)"/>
+                <div class="article" t-att-data-oe-model="w._name" t-att-data-oe-id="w.id">
+            <t t-call="adk_pos.report_z_styles"/>
+            <style>
+                .adk_z .grp td { background: #4338ca; color: #fff; font-weight: bold; padding: 6px 8px; font-size: 11px; }
+                .adk_z .sub td { background: #eef0fb; font-weight: bold; border-top: 1px solid #4338ca; }
+                .adk_z .lines td { color: #6b7194; font-size: 9px; padding: 0 7px 4px 24px; border-bottom: 1px solid #edeff7; }
+                .adk_z .refund td { color: #b42318; }
+                .adk_z .zebra { background: #fafbff; }
+                .adk_z .footer_note { text-align: center; font-size: 9px; color: #7c829f; }
+            </style>
+                    <div class="adk_z">
+                        <table style="width:100%;">
+                            <tr>
+                                <td style="background:#4338ca;padding:16px 20px;">
+                                    <h1 style="margin:0;font-size:21px;color:#fff;">D&#233;tail des ventes</h1>
+                                    <div style="font-size:11.5px;color:#dcd9ff;margin-top:3px;">
+                                        Du <t t-out="w.date_from.strftime('%d/%m/%Y')"/> au <t t-out="w.date_to.strftime('%d/%m/%Y')"/>
+                                    </div>
+                                    <div style="font-size:10.5px;color:#dcd9ff;">
+                                        <t t-out="d['configs']"/>
+                                        <t t-if="w.server_ids"> &#183; Personnel : <t t-out="', '.join(w.server_ids.mapped('name'))"/></t>
+                                        <t t-if="w.payment_method_ids"> &#183; Paiement : <t t-out="', '.join(w.payment_method_ids.mapped('name'))"/></t>
+                                    </div>
+                                </td>
+                                <td style="background:#4338ca;padding:16px 20px;text-align:right;vertical-align:top;">
+                                    <div style="font-size:12px;font-weight:bold;color:#fff;" t-out="d['company'].name"/>
+                                    <div style="font-size:10px;color:#dcd9ff;">&#201;dit&#233; le <span t-out="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y %H:%M')"/></div>
+                                </td>
+                            </tr>
+                        </table>
+                        <br/>
+                        <table style="width:100%;" cellspacing="6">
+                            <tr>
+                                <td class="z_kpi"><div class="v" t-out="d['totals']['count']"/><div class="l">Commandes</div></td>
+                                <td class="z_kpi"><div class="v" t-out="d['fmt'](d['totals']['total'])"/><div class="l">Chiffre d'affaires TTC</div></td>
+                                <td class="z_kpi"><div class="v" t-out="d['fmt'](d['average'])"/><div class="l">Panier moyen</div></td>
+                                <td class="z_kpi"><div class="v" t-out="d['totals']['guests']"/><div class="l">Convives</div></td>
+                            </tr>
+                        </table>
+
+                        <h3>Synth&#232;se</h3>
+                        <table style="width:100%;"><tr>
+                            <td style="width:50%;vertical-align:top;padding-right:10px;">
+                                <table class="z_t">
+                                    <thead><tr><th>Mode de paiement</th><th class="num">Op.</th><th class="num">Montant</th></tr></thead>
+                                    <tbody><tr t-foreach="d['by_method']" t-as="m"><td t-out="m['name']"/><td class="num" t-out="m['count']"/><td class="num" t-out="d['fmt'](m['amount'])"/></tr></tbody>
+                                </table>
+                            </td>
+                            <td style="width:50%;vertical-align:top;padding-left:10px;">
+                                <table class="z_t">
+                                    <thead><tr><th>Serveur</th><th class="num">Cmd</th><th class="num">Montant</th></tr></thead>
+                                    <tbody><tr t-foreach="d['by_server']" t-as="m"><td t-out="m['name']"/><td class="num" t-out="m['count']"/><td class="num" t-out="d['fmt'](m['total'])"/></tr></tbody>
+                                </table>
+                            </td>
+                        </tr></table>
+                        <p class="muted" style="margin-top:8px;">
+                            Remises accord&#233;es : <b t-out="d['fmt'](d['totals']['discount'])"/> &#183;
+                            Remboursements : <b t-out="d['totals']['refund_count']"/> (<t t-out="d['fmt'](d['totals']['refund_total'])"/>) &#183;
+                            Pourboires : <b t-out="d['fmt'](d['totals']['tips'])"/> &#183;
+                            Ventes &#224; cr&#233;dit (non encaiss&#233;es) : <b t-out="d['fmt'](d['totals']['credit'])"/>
+                        </p>
+                        <t t-if="len(d['by_day']) &gt; 1">
+                            <h3>Par jour</h3>
+                            <table class="z_t">
+                                <thead><tr><th>Jour</th><th class="num">Commandes</th><th class="num">Montant</th></tr></thead>
+                                <tbody><tr t-foreach="d['by_day']" t-as="m"><td t-out="m['name']"/><td class="num" t-out="m['count']"/><td class="num" t-out="d['fmt'](m['total'])"/></tr></tbody>
+                            </table>
+                        </t>
+
+                        <div style="page-break-before:always;"/>
+                        <h3>Commandes (<t t-out="len(d['rows'])"/>) &#8212; <t t-out="d['group_label']"/></h3>
+                        <table class="z_t">
+                            <thead><tr><th>N&#176; commande</th><th>Jour</th><th>Heure</th><th>Table / Type</th><th>Serveur</th><th>Client</th><th>Paiement</th><th class="num">Total</th></tr></thead>
+                            <tbody>
+                            <t t-foreach="d['groups']" t-as="g">
+                                <tr class="grp"><td colspan="8"><t t-out="g['title']"/> &#8212; <t t-out="g['count']"/> commande(s) &#183; <t t-out="d['fmt'](g['total'])"/></td></tr>
+                                <t t-foreach="g['rows']" t-as="o">
+                                    <tr t-attf-class="#{'refund' if o['is_refund'] else ''} #{'zebra' if o_index % 2 else ''}">
+                                        <td><span t-out="o['name']"/><t t-if="o['is_refund']"> (remb.)</t></td>
+                                        <td t-out="o['day']"/><td t-out="o['time']"/>
+                                        <td t-out="o['table']"/><td t-out="o['server']"/>
+                                        <td t-out="o['partner'] or '&#8212;'"/>
+                                        <td t-out="o['methods']"/>
+                                        <td class="num" t-out="d['fmt'](o['total'])"/>
+                                    </tr>
+                                    <tr t-if="o['lines']" class="lines"><td colspan="8">
+                                        <t t-foreach="o['lines']" t-as="l"><t t-out="'%g' % l['qty']"/> &#215; <t t-out="l['name']"/><t t-if="not l_last"> &#183; </t></t>
+                                    </td></tr>
+                                </t>
+                                <tr class="sub"><td colspan="7">Sous-total &#8212; <t t-out="g['title']"/></td><td class="num" t-out="d['fmt'](g['total'])"/></tr>
+                            </t>
+                            <tr class="tot"><td colspan="7">TOTAL G&#201;N&#201;RAL (<t t-out="len(d['rows'])"/> commande(s))</td><td class="num" t-out="d['fmt'](d['totals']['total'])"/></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="footer">
+                    <div class="adk_z footer_note">ADK Point de Vente &#183; D&#233;tail des ventes &#183; Page <span class="page"/> / <span class="topage"/></div>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <template id="report_sales_analysis" name="Analyse des ventes ADK POS">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="w">
+                <t t-set="d" t-value="get_data(w)"/>
+                <div class="article" t-att-data-oe-model="w._name" t-att-data-oe-id="w.id">
+                    <t t-call="adk_pos.report_z_styles"/>
+                    <div class="adk_z">
+                        <table style="width:100%;">
+                            <tr>
+                                <td style="background:#4338ca;padding:16px 20px;">
+                                    <h1 style="margin:0;font-size:21px;color:#fff;">Analyse des ventes</h1>
+                                    <div style="font-size:11.5px;color:#dcd9ff;margin-top:3px;">
+                                        Du <t t-out="w.date_from.strftime('%d/%m/%Y')"/> au <t t-out="w.date_to.strftime('%d/%m/%Y')"/>
+                                    </div>
+                                    <div style="font-size:10.5px;color:#dcd9ff;">
+                                        <t t-out="d['configs']"/>
+                                        <t t-if="w.server_ids"> &#183; Personnel : <t t-out="', '.join(w.server_ids.mapped('name'))"/></t>
+                                        <t t-if="w.payment_method_ids"> &#183; Paiement : <t t-out="', '.join(w.payment_method_ids.mapped('name'))"/></t>
+                                    </div>
+                                </td>
+                                <td style="background:#4338ca;padding:16px 20px;text-align:right;vertical-align:top;">
+                                    <div style="font-size:12px;font-weight:bold;color:#fff;" t-out="d['company'].name"/>
+                                    <div style="font-size:10px;color:#dcd9ff;">&#201;dit&#233; le <span t-out="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y %H:%M')"/></div>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <table style="margin-top:12px;"><tr>
+                            <td class="z_kpi"><div class="v" t-out="d['transaction_count']"/><div class="l">Commandes encaiss&#233;es</div></td>
+                            <td class="z_kpi"><div class="v" t-out="d['fmt'](d['total_amount'])"/><div class="l">Ventes TTC</div></td>
+                            <td class="z_kpi"><div class="v" t-out="d['fmt'](d['tips_total'])"/><div class="l">Pourboires</div></td>
+                            <td class="z_kpi"><div class="v" t-out="d['fmt'](d['credit_total'])"/><div class="l">&#192; cr&#233;dit (non encaiss&#233;)</div></td>
+                        </tr></table>
+
+                        <h3>Analyse des ventes par cat&#233;gorie</h3>
+                        <table class="z_t">
+                            <thead><tr><th>Article</th><th class="num">Quantit&#233;</th><th class="num">Montant TTC</th></tr></thead>
+                            <tbody>
+                            <t t-foreach="d['sales_by_category']" t-as="categ">
+                                <tr class="cat">
+                                    <td t-out="categ['name']"/>
+                                    <td class="num" t-out="'%g' % categ['qty']"/>
+                                    <td class="num" t-out="d['fmt'](categ['total'])"/>
+                                </tr>
+                                <tr t-foreach="categ['lines']" t-as="prod" class="prod">
+                                    <td t-out="prod['name']"/>
+                                    <td class="num"><t t-out="'%g' % prod['qty']"/> <span class="muted" t-out="prod['uom']"/></td>
+                                    <td class="num" t-out="d['fmt'](prod['total'])"/>
+                                </tr>
+                                <tr t-if="categ['others']" class="prod">
+                                    <td><i class="muted">Autres articles (<t t-out="categ['others']['count']"/>)</i></td>
+                                    <td class="num" t-out="'%g' % categ['others']['qty']"/>
+                                    <td class="num" t-out="d['fmt'](categ['others']['total'])"/>
+                                </tr>
+                            </t>
+                            <tr class="tot"><td>TOTAL</td><td class="num" t-out="'%g' % d['total_qty']"/><td class="num" t-out="d['fmt'](d['categ_amount'])"/></tr>
+                            </tbody>
+                        </table>
+                        <p class="muted" t-if="d['limit']">Les <t t-out="d['limit']"/> articles les plus vendus sont d&#233;taill&#233;s par cat&#233;gorie ; les autres sont regroup&#233;s (totaux exacts).</p>
+
+                        <h3>Paiements</h3>
+                        <table class="z_t">
+                            <thead><tr><th>Mode de paiement</th><th class="num">Op&#233;rations</th><th class="num">Montant</th></tr></thead>
+                            <tbody>
+                            <tr t-foreach="d['payment_lines']" t-as="pay">
+                                <td><t t-out="pay['name']"/> <span t-if="pay.get('is_credit')" class="badge b_ko">non encaiss&#233;</span></td>
+                                <td class="num" t-out="pay['count']"/>
+                                <td class="num" t-out="d['fmt'](pay['amount'])"/>
+                            </tr>
+                            <tr class="tot"><td>Total</td><td/><td class="num" t-out="d['fmt'](d['payments_total'])"/></tr>
+                            </tbody>
+                        </table>
+
+                        <h3>Taxes</h3>
+                        <table class="z_t">
+                            <thead><tr><th>Taxe</th><th class="num">Base HT</th><th class="num">Montant</th></tr></thead>
+                            <tbody>
+                            <tr t-foreach="d['tax_lines']" t-as="tax">
+                                <td t-out="tax['name']"/>
+                                <td class="num" t-out="d['fmt'](tax['base'])"/>
+                                <td class="num" t-out="d['fmt'](tax['amount'])"/>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                        <h3>Remises &amp; remboursements</h3>
+                        <p>Remises : <b t-out="d['discount_count']"/> ligne(s) pour <b t-out="d['fmt'](d['discount_amount'])"/>
+                           &#183; Remboursements : <b t-out="d['refund_count']"/> pour <b t-out="d['fmt'](d['refund_amount'])"/></p>
+
+                        <h3>Analyse</h3>
+                        <table style="width:100%;"><tr>
+                            <td style="width:50%;vertical-align:top;padding-right:10px;">
+                                <table class="z_t" t-if="d['by_server']">
+                                    <thead><tr><th>Serveur</th><th class="num">Cmd</th><th class="num">Montant</th></tr></thead>
+                                    <tbody><tr t-foreach="d['by_server']" t-as="c"><td t-out="c['name']"/><td class="num" t-out="c['count']"/><td class="num" t-out="d['fmt'](c['total'])"/></tr></tbody>
+                                </table>
+                                <br/>
+                                <table class="z_t" t-if="d['cashiers']">
+                                    <thead><tr><th>Caissier</th><th class="num">Cmd</th><th class="num">Montant</th></tr></thead>
+                                    <tbody><tr t-foreach="d['cashiers']" t-as="c"><td t-out="c['name']"/><td class="num" t-out="c['count']"/><td class="num" t-out="d['fmt'](c['total'])"/></tr></tbody>
+                                </table>
+                            </td>
+                            <td style="width:50%;vertical-align:top;padding-left:10px;">
+                                <table class="z_t" t-if="d['order_types']">
+                                    <thead><tr><th>Type</th><th class="num">Cmd</th><th class="num">Montant</th></tr></thead>
+                                    <tbody><tr t-foreach="d['order_types']" t-as="c"><td t-out="c['name']"/><td class="num" t-out="c['count']"/><td class="num" t-out="d['fmt'](c['total'])"/></tr></tbody>
+                                </table>
+                                <br/>
+                                <table class="z_t" t-if="d['by_hour']">
+                                    <thead><tr><th>Heure</th><th class="num">Cmd</th><th class="num">Montant</th></tr></thead>
+                                    <tbody><tr t-foreach="d['by_hour']" t-as="c"><td t-out="c['name']"/><td class="num" t-out="c['count']"/><td class="num" t-out="d['fmt'](c['total'])"/></tr></tbody>
+                                </table>
+                            </td>
+                        </tr></table>
+
+                        <t t-if="len(d['by_day']) &gt; 1">
+                            <h3>Par jour</h3>
+                            <table class="z_t">
+                                <thead><tr><th>Jour</th><th class="num">Commandes</th><th class="num">Montant</th></tr></thead>
+                                <tbody><tr t-foreach="d['by_day']" t-as="c"><td t-out="c['name']"/><td class="num" t-out="c['count']"/><td class="num" t-out="d['fmt'](c['total'])"/></tr></tbody>
+                            </table>
+                        </t>
+                        <p class="muted" style="margin-top:18px;text-align:center;font-size:9.5px;">Document g&#233;n&#233;r&#233; par ADK Point de Vente</p>
+                    </div>
+                </div>
+                <div class="footer">
+                    <div style="text-align:center;font-size:9px;color:#7c829f;font-family:Arial;">ADK Point de Vente &#183; Analyse des ventes &#183; Page <span class="page"/> / <span class="topage"/></div>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_sales_analysis" model="ir.actions.report">
+        <field name="name">Analyse des ventes (PDF)</field>
+        <field name="model">adk.pos.sales.detail.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">adk_pos.report_sales_analysis</field>
+        <field name="report_file">adk_pos.report_sales_analysis</field>
+        <field name="print_report_name">'Analyse_des_ventes_%s_%s' % (object.date_from, object.date_to)</field>
+        <field name="paperformat_id" ref="paperformat_adk_pos_a4_report"/>
+    </record>
+
+    <record id="action_report_sales_detail" model="ir.actions.report">
+        <field name="name">Liste des commandes (PDF)</field>
+        <field name="model">adk.pos.sales.detail.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">adk_pos.report_sales_detail</field>
+        <field name="report_file">adk_pos.report_sales_detail</field>
+        <field name="print_report_name">'Detail_des_ventes_%s_%s' % (object.date_from, object.date_to)</field>
+        <field name="paperformat_id" ref="paperformat_adk_pos_a4_report"/>
+    </record>
+</odoo>

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_adk_pos_order_pivot" model="ir.ui.view">
+        <field name="name">adk.pos.order.pivot</field>
+        <field name="model">adk.pos.order</field>
+        <field name="arch" type="xml">
+            <pivot string="Analyse des ventes">
+                <field name="date_paid" interval="day" type="row"/>
+                <field name="server_id" type="row"/>
+                <field name="config_id" type="col"/>
+                <field name="amount_total" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_adk_pos_order_graph" model="ir.ui.view">
+        <field name="name">adk.pos.order.graph</field>
+        <field name="model">adk.pos.order</field>
+        <field name="arch" type="xml">
+            <graph string="Évolution des ventes" type="bar">
+                <field name="date_paid" interval="day" type="row"/>
+                <field name="amount_total" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_adk_pos_analysis" model="ir.actions.act_window">
+        <field name="name">Analyse des ventes</field>
+        <field name="res_model">adk.pos.order</field>
+        <field name="view_mode">pivot,graph,list</field>
+        <field name="domain">[('state', '=', 'paid')]</field>
+        <field name="search_view_id" ref="view_adk_pos_order_search"/>
+    </record>
+
+    <record id="view_adk_pos_order_line_pivot" model="ir.ui.view">
+        <field name="name">adk.pos.order.line.pivot</field>
+        <field name="model">adk.pos.order.line</field>
+        <field name="arch" type="xml">
+            <pivot string="Analyse par produit">
+                <field name="product_id" type="row"/>
+                <field name="qty" type="measure"/>
+                <field name="price_total" type="measure"/>
+                <field name="margin" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_adk_pos_order_line_graph" model="ir.ui.view">
+        <field name="name">adk.pos.order.line.graph</field>
+        <field name="model">adk.pos.order.line</field>
+        <field name="arch" type="xml">
+            <graph string="Produits les plus vendus" type="bar">
+                <field name="product_id" type="row"/>
+                <field name="price_total" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_adk_pos_order_line_list" model="ir.ui.view">
+        <field name="name">adk.pos.order.line.list</field>
+        <field name="model">adk.pos.order.line</field>
+        <field name="arch" type="xml">
+            <list create="false">
+                <field name="order_id"/>
+                <field name="product_id"/>
+                <field name="qty" sum="Qté"/>
+                <field name="price_total" sum="Total"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_adk_pos_analysis_products" model="ir.actions.act_window">
+        <field name="name">Analyse par produit</field>
+        <field name="res_model">adk.pos.order.line</field>
+        <field name="view_mode">pivot,graph,list</field>
+        <field name="domain">[('order_id.state', '=', 'paid')]</field>
+    </record>
+
+    <record id="view_adk_pos_kitchen_item_list" model="ir.ui.view">
+        <field name="name">adk.pos.kitchen.item.list</field>
+        <field name="model">adk.pos.kitchen.item</field>
+        <field name="arch" type="xml">
+            <list create="false" edit="false">
+                <field name="date_sent"/>
+                <field name="order_id"/>
+                <field name="table_id"/>
+                <field name="name"/>
+                <field name="qty"/>
+                <field name="station_id"/>
+                <field name="state" widget="badge"/>
+                <field name="date_ready" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_adk_pos_kitchen_items" model="ir.actions.act_window">
+        <field name="name">Historique de préparation</field>
+        <field name="res_model">adk.pos.kitchen.item</field>
+        <field name="view_mode">list</field>
+    </record>
+
+</odoo>

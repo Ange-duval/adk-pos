@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_adk_pos_cash_move_list" model="ir.ui.view">
+        <field name="name">adk.pos.cash.move.list</field>
+        <field name="model">adk.pos.cash.move</field>
+        <field name="arch" type="xml">
+            <list create="false">
+                <field name="create_date" string="Date"/>
+                <field name="move_type" widget="badge"
+                       decoration-success="move_type == 'in'" decoration-danger="move_type == 'out'"/>
+                <field name="reason"/>
+                <field name="user_id"/>
+                <field name="amount" widget="monetary"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+</odoo>

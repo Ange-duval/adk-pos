@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_adk_pos_floor_list" model="ir.ui.view">
+        <field name="name">adk.pos.floor.list</field>
+        <field name="model">adk.pos.floor</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="config_id"/>
+                <field name="name"/>
+                <field name="table_count"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_adk_pos_floor_form" model="ir.ui.view">
+        <field name="name">adk.pos.floor.form</field>
+        <field name="model">adk.pos.floor</field>
+        <field name="arch" type="xml">
+            <form string="Salle / Zone">
+                <header>
+                    <button name="action_open_generate_wizard" type="object" string="Générer les tables"
+                            class="btn-primary" icon="fa-magic"/>
+                    <button name="action_arrange_tables" type="object" string="Ranger les tables" icon="fa-th"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="config_id"/>
+                            <field name="name"/>
+                            <field name="background_color" widget="color"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="background_image" widget="image" options="{'size': [0, 120]}"/>
+                            <field name="canvas_width" invisible="1"/>
+                            <field name="canvas_height" invisible="1"/>
+                        </group>
+                    </group>
+                    <p class="text-muted">Importez l'image de votre plan de salle puis cliquez sur « Générer les tables ».
+                        Les tables sont rangées sans se chevaucher ; vous pouvez les déplacer ensuite dans le terminal.</p>
+                    <notebook>
+                        <page string="Tables">
+                            <field name="table_ids">
+                                <list editable="bottom">
+                                    <field name="name"/>
+                                    <field name="seats"/>
+                                    <field name="shape"/>
+                                    <field name="pos_x" optional="hide"/>
+                                    <field name="pos_y" optional="hide"/>
+                                    <field name="width" optional="hide"/>
+                                    <field name="height" optional="hide"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_adk_pos_floor" model="ir.actions.act_window">
+        <field name="name">Salles / Plans de salle</field>
+        <field name="res_model">adk.pos.floor</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html"><p class="o_view_nocontent_smiling_face">Créez une salle en choisissant d'abord son point de vente.</p></field>
+    </record>
+
+    <record id="view_adk_pos_table_kanban" model="ir.ui.view">
+        <field name="name">adk.pos.table.kanban</field>
+        <field name="model">adk.pos.table</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="floor_id" group_create="false" group_delete="false" group_edit="false">
+                <field name="name"/>
+                <field name="seats"/>
+                <field name="state"/>
+                <templates>
+                    <t t-name="card">
+                        <div t-attf-class="adk_table_card adk_table_#{record.state.raw_value}">
+                            <strong><field name="name"/></strong>
+                            <div><i class="fa fa-users"/> <field name="seats"/> places</div>
+                            <field name="state" widget="badge"
+                                   decoration-success="state == 'free'" decoration-danger="state == 'occupied'"
+                                   decoration-warning="state == 'billing'" decoration-info="state == 'reserved'"/>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_adk_pos_table_list" model="ir.ui.view">
+        <field name="name">adk.pos.table.list</field>
+        <field name="model">adk.pos.table</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="name"/>
+                <field name="floor_id"/>
+                <field name="seats"/>
+                <field name="shape"/>
+                <field name="state" readonly="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_adk_pos_table_form" model="ir.ui.view">
+        <field name="name">adk.pos.table.form</field>
+        <field name="model">adk.pos.table</field>
+        <field name="arch" type="xml">
+            <form string="Table">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="floor_id"/>
+                            <field name="seats"/>
+                            <field name="shape"/>
+                            <field name="active"/>
+                        </group>
+                        <group string="Position sur le plan">
+                            <field name="pos_x"/>
+                            <field name="pos_y"/>
+                            <field name="width"/>
+                            <field name="height"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_adk_pos_table" model="ir.actions.act_window">
+        <field name="name">Tables / Plan de salle</field>
+        <field name="res_model">adk.pos.table</field>
+        <field name="view_mode">kanban,list,form</field>
+    </record>
+
+</odoo>

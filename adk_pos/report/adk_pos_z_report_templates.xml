@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_z_styles" name="Rapport Z - ADK POS (styles)">
+        <style>
+            .adk_z { font-family: Arial, Helvetica, sans-serif; font-size: 11px; color: #1f2440; line-height: 1.35; }
+            .adk_z table { width: 100%; border-collapse: collapse; }
+            .adk_z .z_band { background: #4338ca; color: #ffffff; padding: 16px 20px; }
+            .adk_z .z_band h1 { margin: 0; font-size: 21px; color: #ffffff; }
+            .adk_z .z_band .sub { font-size: 11.5px; color: #dcd9ff; margin-top: 3px; }
+            .adk_z .z_band .co { font-size: 12px; font-weight: bold; text-align: right; color: #ffffff; }
+            .adk_z .z_band .co span { font-weight: normal; color: #dcd9ff; font-size: 10.5px; }
+            .adk_z .z_kpi { width: 25%; text-align: center; padding: 14px 6px; border: 1px solid #e4e7f2; background: #f7f8fc; }
+            .adk_z .z_kpi .v { font-size: 17px; font-weight: bold; color: #4338ca; }
+            .adk_z .z_kpi .l { font-size: 9px; text-transform: uppercase; color: #7c829f; letter-spacing: .5px; margin-top: 2px; }
+            .adk_z h3 { font-size: 11.5px; text-transform: uppercase; letter-spacing: .6px; color: #4338ca; margin: 20px 0 6px; padding-bottom: 4px; border-bottom: 2px solid #4338ca; page-break-after: avoid; }
+            .adk_z table.z_t th { background: #eef0fb; color: #4b5170; font-size: 9.5px; text-transform: uppercase; letter-spacing: .3px; text-align: left; padding: 6px 7px; border-bottom: 1px solid #cfd3ea; }
+            .adk_z table.z_t td { padding: 5px 7px; border-bottom: 1px solid #edeff7; vertical-align: top; }
+            .adk_z table.z_t tr, .adk_z table.z_t td, .adk_z table.z_t th { page-break-inside: avoid; }
+            .adk_z table.z_t thead { display: table-header-group; }
+            .adk_z .num { text-align: right; white-space: nowrap; }
+            .adk_z .ctr { text-align: center; }
+            .adk_z tr.cat td { background: #f3f4fb; font-weight: bold; color: #2c3357; border-top: 1px solid #cfd3ea; }
+            .adk_z tr.prod td:first-child { padding-left: 20px; color: #4b5170; }
+            .adk_z tr.tot td { font-weight: bold; background: #eef0fb; border-top: 2px solid #4338ca; color: #1f2440; }
+            .adk_z .muted { color: #7c829f; }
+            .adk_z .badge { display: inline-block; padding: 2px 9px; border-radius: 9px; font-size: 9.5px; font-weight: bold; }
+            .adk_z .b_ok { background: #dff5e8; color: #167a47; }
+            .adk_z .b_open { background: #e6e9ff; color: #3730a3; }
+            .adk_z .b_ko { background: #fde4e4; color: #b42318; }
+            .adk_z .infot td { padding: 6px 10px; border: 1px solid #e4e7f2; width: 33%; }
+            .adk_z .infot .il { font-size: 8.5px; text-transform: uppercase; color: #7c829f; }
+            .adk_z .infot .iv { font-size: 11.5px; font-weight: bold; }
+            .adk_z .pos { color: #167a47; } .adk_z .neg { color: #b42318; }
+        </style>
+    </template>
+
+    <template id="report_z_body" name="Rapport Z - ADK POS (corps)">
+        <div class="adk_z">
+            <table class="z_band" style="width:100%;">
+                <tr>
+                    <td style="background:#4338ca;padding:16px 20px;">
+                        <h1 style="margin:0;font-size:21px;color:#fff;">Rapport <t t-out="z['report_letter']"/> &#8212; D&#233;tail des ventes</h1>
+                        <div style="font-size:11.5px;color:#dcd9ff;margin-top:3px;">
+                            Session <t t-out="z['session'].name"/> &#183; <t t-out="z['session'].config_id.name"/>
+                        </div>
+                        <div style="font-size:11px;color:#dcd9ff;">
+                            Du <span t-out="z['session'].opening_date" t-options="{'widget': 'datetime'}"/>
+                            <t t-if="z['session'].closing_date"> au <span t-out="z['session'].closing_date" t-options="{'widget': 'datetime'}"/></t>
+                            <t t-else=""> &#8212; en cours</t>
+                        </div>
+                    </td>
+                    <td style="background:#4338ca;padding:16px 20px;text-align:right;vertical-align:top;">
+                        <div style="font-size:12px;font-weight:bold;color:#fff;" t-out="z['company'].name"/>
+                        <div style="font-size:10.5px;color:#dcd9ff;">
+                            <t t-if="z['company'].street" t-out="z['company'].street"/>
+                            <t t-if="z['company'].city"> &#183; <t t-out="z['company'].city"/></t>
+                        </div>
+                        <div style="margin-top:6px;">
+                            <span t-attf-class="badge #{'b_ok' if z['is_closed'] else 'b_open'}"
+                                  t-out="'CAISSE FERM&#201;E' if z['is_closed'] else 'SESSION EN COURS'"/>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+            <table style="margin-top:12px;"><tr>
+                <td class="z_kpi"><div class="v" t-out="z['transaction_count']"/><div class="l">Commandes encaiss&#233;es</div></td>
+                <td class="z_kpi"><div class="v" t-out="z['fmt'](z['total_amount'])"/><div class="l">Ventes TTC</div></td>
+                <td class="z_kpi"><div class="v" t-out="z['fmt'](z['tips_total'])"/><div class="l">Pourboires</div></td>
+                <td class="z_kpi"><div class="v" t-out="z['fmt'](z['credit_total'])"/><div class="l">&#192; cr&#233;dit (non encaiss&#233;)</div></td>
+            </tr></table>
+
+            <table class="infot" style="margin-top:10px;">
+                <tr>
+                    <td><div class="il">Ouvert par</div><div class="iv" t-out="z['session'].cashier_id.name"/></td>
+                    <td><div class="il">Ferm&#233; par</div><div class="iv" t-out="z['session'].closed_by_id.name or '&#8212;'"/></td>
+                    <td><div class="il">Fond de caisse</div><div class="iv" t-out="z['fmt'](z['session'].opening_balance)"/></td>
+                </tr>
+                <tr>
+                    <td><div class="il">Esp&#232;ces attendues</div><div class="iv" t-out="z['fmt'](z['session'].closing_balance_expected)"/></td>
+                    <td><div class="il">Esp&#232;ces compt&#233;es</div><div class="iv" t-out="z['fmt'](z['session'].closing_balance_actual)"/></td>
+                    <td><div class="il">&#201;cart de caisse</div>
+                        <div t-attf-class="iv #{'neg' if z['session'].cash_difference &lt; 0 else ('pos' if z['session'].cash_difference &gt; 0 else '')}" t-out="z['fmt'](z['session'].cash_difference)"/></td>
+                </tr>
+            </table>
+
+            <h3>D&#233;tail des ventes par cat&#233;gorie</h3>
+            <table class="z_t">
+                <thead><tr><th>Article</th><th class="num">Quantit&#233;</th><th class="num">Montant TTC</th></tr></thead>
+                <tbody>
+                <t t-foreach="z['sales_by_category']" t-as="categ">
+                    <tr class="cat">
+                        <td t-out="categ['name']"/>
+                        <td class="num" t-out="'%g' % categ['qty']"/>
+                        <td class="num" t-out="z['fmt'](categ['total'])"/>
+                    </tr>
+                    <tr t-foreach="categ['lines']" t-as="prod" class="prod">
+                        <td t-out="prod['name']"/>
+                        <td class="num"><t t-out="'%g' % prod['qty']"/> <span class="muted" t-out="prod['uom']"/></td>
+                        <td class="num" t-out="z['fmt'](prod['total'])"/>
+                    </tr>
+                </t>
+                <tr class="tot"><td>TOTAL</td><td class="num" t-out="'%g' % z['total_qty']"/><td class="num" t-out="z['fmt'](z['total_amount'])"/></tr>
+                </tbody>
+            </table>
+
+            <div t-if="z['order_rows']" style="page-break-before:always;"/>
+            <h3 t-if="z['order_rows']">Annexe &#8212; D&#233;tail commande par commande (<t t-out="len(z['order_rows'])"/>)</h3>
+            <table class="z_t" t-if="z['order_rows']">
+                <thead><tr><th>N&#176;</th><th>Heure</th><th>Table / Type</th><th>Serveur</th><th>Client</th><th>Paiement</th><th>Facture</th><th class="num">Total</th></tr></thead>
+                <tbody>
+                <tr t-foreach="z['order_rows']" t-as="o">
+                    <td><span t-out="o['name']"/><span t-if="o['is_refund']" class="badge b_ko"> Remb.</span></td>
+                    <td t-out="o['time']"/>
+                    <td t-out="o['table']"/>
+                    <td t-out="o['server']"/>
+                    <td><t t-out="o['partner'] or '&#8212;'"/></td>
+                    <td t-out="o['methods']"/>
+                    <td><t t-out="o['invoice'] or '&#8212;'"/><div class="muted" t-if="o['invoice_state']" t-out="o['invoice_state']"/></td>
+                    <td class="num" t-out="z['fmt'](o['total'])"/>
+                </tr>
+                <tr class="tot"><td colspan="7">TOTAL (<t t-out="len(z['order_rows'])"/> commande(s))</td><td class="num" t-out="z['fmt'](sum(o['total'] for o in z['order_rows']))"/></tr>
+                </tbody>
+            </table>
+
+            <h3>Paiements</h3>
+            <table class="z_t">
+                <thead><tr><th>Mode de paiement</th><th class="num">Op&#233;rations</th><th class="num">Montant</th></tr></thead>
+                <tbody>
+                <tr t-foreach="z['payment_lines']" t-as="pay">
+                    <td><t t-out="pay['name']"/> <span t-if="pay.get('is_credit')" class="badge b_ko">non encaiss&#233;</span></td>
+                    <td class="num" t-out="pay['count']"/>
+                    <td class="num" t-out="z['fmt'](pay['amount'])"/>
+                </tr>
+                <tr class="tot"><td>Total</td><td/><td class="num" t-out="z['fmt'](z['payments_total'])"/></tr>
+                </tbody>
+            </table>
+
+            <h3>Taxes</h3>
+            <table class="z_t">
+                <thead><tr><th>Taxe</th><th class="num">Base HT</th><th class="num">Montant</th></tr></thead>
+                <tbody>
+                <tr t-foreach="z['tax_lines']" t-as="tax">
+                    <td t-out="tax['name']"/>
+                    <td class="num" t-out="z['fmt'](tax['base'])"/>
+                    <td class="num" t-out="z['fmt'](tax['amount'])"/>
+                </tr>
+                </tbody>
+            </table>
+
+            <h3>Contr&#244;le de caisse</h3>
+            <table class="z_t">
+                <thead><tr><th>Mode</th><th class="num">Pr&#233;vu</th><th class="num">Compt&#233;</th><th class="num">&#201;cart</th></tr></thead>
+                <tbody>
+                <tr t-foreach="z['session_control']" t-as="ctrl">
+                    <td t-out="ctrl['name']"/>
+                    <td class="num" t-out="z['fmt'](ctrl['expected'])"/>
+                    <td class="num" t-out="z['fmt'](ctrl['counted'])"/>
+                    <td class="num"><span t-attf-class="#{'neg' if ctrl['difference'] &lt; 0 else ('pos' if ctrl['difference'] &gt; 0 else '')}" t-out="z['fmt'](ctrl['difference'])"/></td>
+                </tr>
+                </tbody>
+            </table>
+            <p class="muted" t-if="z['cash_in_total'] or z['cash_out_total']">
+                Entr&#233;es de caisse : <t t-out="z['fmt'](z['cash_in_total'])"/> &#183;
+                Sorties de caisse : <t t-out="z['fmt'](z['cash_out_total'])"/>
+            </p>
+            <table class="z_t" t-if="z['cash_moves']">
+                <thead><tr><th>Mouvement</th><th>Motif</th><th>Par</th><th class="num">Montant</th></tr></thead>
+                <tbody>
+                <tr t-foreach="z['cash_moves']" t-as="mv">
+                    <td t-out="'Entr&#233;e' if mv['type'] == 'in' else 'Sortie'"/>
+                    <td t-out="mv['reason']"/><td t-out="mv['user']"/>
+                    <td class="num" t-out="z['fmt'](mv['amount'])"/>
+                </tr>
+                </tbody>
+            </table>
+
+            <h3>Remises &amp; remboursements</h3>
+            <p>Remises : <b t-out="z['discount_count']"/> ligne(s) pour <b t-out="z['fmt'](z['discount_amount'])"/>
+               &#183; Remboursements : <b t-out="z['refund_count']"/> pour <b t-out="z['fmt'](z['refund_amount'])"/></p>
+
+            <t t-if="z['by_server'] or z['cashiers'] or z['order_types'] or z['by_hour']">
+                <h3>Analyse</h3>
+                <table style="width:100%;"><tr>
+                    <td style="width:50%;vertical-align:top;padding-right:10px;">
+                        <table class="z_t" t-if="z['by_server']">
+                            <thead><tr><th>Serveur</th><th class="num">Cmd</th><th class="num">Montant</th></tr></thead>
+                            <tbody><tr t-foreach="z['by_server']" t-as="c"><td t-out="c['name']"/><td class="num" t-out="c['count']"/><td class="num" t-out="z['fmt'](c['total'])"/></tr></tbody>
+                        </table>
+                        <br/>
+                        <table class="z_t" t-if="z['cashiers']">
+                            <thead><tr><th>Caissier</th><th class="num">Cmd</th><th class="num">Montant</th></tr></thead>
+                            <tbody><tr t-foreach="z['cashiers']" t-as="c"><td t-out="c['name']"/><td class="num" t-out="c['count']"/><td class="num" t-out="z['fmt'](c['total'])"/></tr></tbody>
+                        </table>
+                    </td>
+                    <td style="width:50%;vertical-align:top;padding-left:10px;">
+                        <table class="z_t" t-if="z['order_types']">
+                            <thead><tr><th>Type</th><th class="num">Cmd</th><th class="num">Montant</th></tr></thead>
+                            <tbody><tr t-foreach="z['order_types']" t-as="t"><td t-out="t['name']"/><td class="num" t-out="t['count']"/><td class="num" t-out="z['fmt'](t['total'])"/></tr></tbody>
+                        </table>
+                        <br/>
+                        <table class="z_t" t-if="z['by_hour']">
+                            <thead><tr><th>Heure</th><th class="num">Cmd</th><th class="num">Montant</th></tr></thead>
+                            <tbody><tr t-foreach="z['by_hour']" t-as="h"><td t-out="h['name']"/><td class="num" t-out="h['count']"/><td class="num" t-out="z['fmt'](h['total'])"/></tr></tbody>
+                        </table>
+                    </td>
+                </tr></table>
+            </t>
+
+            <t t-if="z['opening_count_details'] or z['closing_count_details']">
+                <h3>Comptage du tiroir-caisse</h3>
+                <div t-if="z['opening_count_details']" style="white-space:pre-line;"><b>Ouverture :</b> <t t-out="z['opening_count_details']"/></div>
+                <div t-if="z['closing_count_details']" style="white-space:pre-line;"><b>Fermeture :</b> <t t-out="z['closing_count_details']"/></div>
+            </t>
+            <p class="muted" style="margin-top:18px;text-align:center;font-size:9.5px;">Document g&#233;n&#233;r&#233; par ADK Point de Vente</p>
+        </div>
+    </template>
+
+    <template id="report_z_document" name="Rapport Z - ADK POS">
+        <html>
+            <head>
+                <meta charset="utf-8"/>
+                <t t-call="adk_pos.report_z_styles"/>
+                <style>body { max-width: 900px; margin: 20px auto; background:#fff; }</style>
+            </head>
+            <body>
+                <t t-call="adk_pos.report_z_body"/>
+            </body>
+        </html>
+    </template>
+
+    <template id="report_z_document_pdf" name="Rapport Z - ADK POS (PDF)">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-set="z" t-value="o.get_z_report_data()"/>
+                <div class="article" t-att-data-oe-model="o._name" t-att-data-oe-id="o.id">
+                    <t t-call="adk_pos.report_z_styles"/>
+                    <div class="page">
+                        <t t-call="adk_pos.report_z_body"/>
+                    </div>
+                </div>
+                <div class="footer">
+                    <div style="text-align:center;font-size:9px;color:#7c829f;font-family:Arial;">ADK Point de Vente &#183; <t t-out="z['session'].name"/> &#183; Page <span class="page"/> / <span class="topage"/></div>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_z_pdf" model="ir.actions.report">
+        <field name="name">Rapport X/Z - Analyse des ventes (PDF)</field>
+        <field name="model">adk.pos.session</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">adk_pos.report_z_document_pdf</field>
+        <field name="report_file">adk_pos.report_z_document_pdf</field>
+        <field name="print_report_name">'Rapport_%s_%s' % ('Z' if object.state == 'closed' else 'X', object.name.replace('/', '_'))</field>
+        <field name="binding_model_id" ref="model_adk_pos_session"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="paperformat_adk_pos_a4_report"/>
+    </record>
+</odoo>

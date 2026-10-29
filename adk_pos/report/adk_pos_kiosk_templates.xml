@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="kiosk_unavailable" name="Kiosque indisponible">
+        <html>
+            <head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/></head>
+            <body style="font-family:sans-serif;text-align:center;padding:60px 20px;color:#2C3357;">
+                <h2>Commande en ligne indisponible</h2>
+                <p>Ce point de vente n'a pas activé la commande autonome pour le moment.</p>
+            </body>
+        </html>
+    </template>
+
+    <template id="kiosk_page" name="Kiosque de commande autonome">
+        <html>
+            <head>
+                <meta charset="utf-8"/>
+                <meta name="viewport" content="width=device-width, initial-scale=1"/>
+                <title>Commander - <t t-esc="config.name"/></title>
+                <style>
+                    * { box-sizing: border-box; }
+                    body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; background: #F6F7FB; color: #2C3357; }
+                    header { background: #fff; padding: 18px 20px; box-shadow: 0 2px 10px rgba(44,51,87,.06); position: sticky; top: 0; z-index: 5; }
+                    header h1 { font-size: 18px; margin: 0; }
+                    .categ-tabs { display: flex; gap: 8px; overflow-x: auto; padding: 12px 20px; background: #fff; }
+                    .categ-tab { flex: none; border: none; background: #EEF0F7; color: #4A4F6A; padding: 8px 16px; border-radius: 20px; font-weight: 600; font-size: 13px; cursor: pointer; }
+                    .categ-tab.active { background: #6C63FF; color: #fff; }
+                    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); gap: 14px; padding: 16px 20px; }
+                    .card { background: #fff; border-radius: 14px; overflow: hidden; box-shadow: 0 3px 10px rgba(44,51,87,.06); cursor: pointer; }
+                    .card img { width: 100%; height: 90px; object-fit: cover; display: block; background: #F1F2F8; }
+                    .card .ph { width: 100%; height: 90px; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 700; color: #fff; background: linear-gradient(135deg,#6C63FF,#9F97FF); }
+                    .card .name { padding: 8px 10px 0; font-size: 13px; font-weight: 600; }
+                    .card .price { padding: 2px 10px 10px; font-size: 13px; color: #6C63FF; font-weight: 700; }
+                    .cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #2C3357; color: #fff; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; font-weight: 700; cursor: pointer; }
+                    .cart-panel { position: fixed; inset: 0; background: #fff; z-index: 20; display: none; flex-direction: column; }
+                    .cart-panel.open { display: flex; }
+                    .cart-panel-header { padding: 18px 20px; border-bottom: 1px solid #EEF0F7; display: flex; justify-content: space-between; align-items: center; }
+                    .cart-lines { flex: 1; overflow-y: auto; padding: 10px 20px; }
+                    .cart-line { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #F1F2F8; }
+                    .qty-ctrl button { width: 26px; height: 26px; border-radius: 6px; border: none; background: #EEF0F7; font-weight: 700; }
+                    .send-btn { margin: 16px 20px; padding: 16px; border: none; border-radius: 12px; background: linear-gradient(135deg,#6C63FF,#574FE0); color: #fff; font-weight: 700; font-size: 15px; }
+                    .empty { text-align: center; color: #B0B4C3; padding: 40px 0; }
+                </style>
+            </head>
+            <body t-att-data-config-id="config.id" t-att-data-table-id="table.id if table else ''"
+                  t-att-data-currency="config.currency_id.symbol"
+                  t-att-data-menu-only="'1' if config.kiosk_mode == 'qr_menu' else None">
+                <img t-if="config.kiosk_header_image" t-attf-src="/web/image/adk.pos.config/#{config.id}/kiosk_header_image"
+                     alt="" style="width:100%;max-height:180px;object-fit:cover;display:block;"/>
+                <img t-elif="config.kiosk_splash_ids" t-attf-src="/web/image/#{config.kiosk_splash_ids[0].id}"
+                     alt="" style="width:100%;max-height:180px;object-fit:cover;display:block;"/>
+                <header>
+                    <h1><t t-esc="config.name"/><t t-if="table"> — Table <t t-esc="table.name"/></t></h1>
+                    <div t-if="config.kiosk_welcome_text" style="opacity:.85;font-size:14px;margin-top:4px;" t-esc="config.kiosk_welcome_text"/>
+                </header>
+                <div class="categ-tabs" id="categTabs">
+                    <t t-foreach="categories" t-as="categ">
+                        <button class="categ-tab" t-att-data-categ="categ.id" t-esc="categ.name"/>
+                    </t>
+                </div>
+                <div class="grid" id="productGrid">
+                    <t t-foreach="products" t-as="product">
+                        <div class="card" t-att-data-categ="product.categ_id.id"
+                             t-att-data-id="product.id" t-att-data-name="product.name"
+                             t-att-data-price="product.list_price">
+                            <img t-if="product.adk_pos_has_image"
+                                 t-attf-src="/web/image/product.product/#{product.id}/image_128" alt=""/>
+                            <div t-else="" class="ph"><t t-esc="(product.name or '?')[0]"/></div>
+                            <div class="name"><t t-esc="product.name"/></div>
+                            <div class="price"><t t-esc="'%.0f' % product.list_price"/> <t t-esc="config.currency_id.symbol"/></div>
+                        </div>
+                    </t>
+                </div>
+
+                <div class="cart-bar" id="cartBar" style="display:none;" onclick="document.getElementById('cartPanel').classList.add('open')">
+                    <span id="cartCount">0 article(s)</span>
+                    <span id="cartTotal">0</span>
+                </div>
+
+                <div class="cart-panel" id="cartPanel">
+                    <div class="cart-panel-header">
+                        <strong>Votre commande</strong>
+                        <button onclick="document.getElementById('cartPanel').classList.remove('open')"
+                                style="border:none;background:none;font-size:20px;">&#10005;</button>
+                    </div>
+                    <div class="cart-lines" id="cartLines"><div class="empty">Panier vide</div></div>
+                    <textarea id="customerNote" placeholder="Une précision ? (allergie, sans piment…)" style="margin:0 20px;padding:10px;border:1px solid #DDE0EC;border-radius:10px;font-family:inherit;"></textarea>
+                    <button class="send-btn" id="sendBtn" onclick="submitOrder()">Envoyer la commande</button>
+                </div>
+
+                <script type="text/javascript">
+                    <![CDATA[
+                    var cart = {};
+                    var currency = document.body.getAttribute('data-currency') || '';
+                    function esc(t) { var d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+                    var configId = document.body.getAttribute('data-config-id');
+                    var tableIdRaw = document.body.getAttribute('data-table-id');
+                    var tableId = tableIdRaw ? parseInt(tableIdRaw, 10) : null;
+
+                    document.getElementById('categTabs').addEventListener('click', function(ev){
+                        if (!ev.target.classList.contains('categ-tab')) return;
+                        document.querySelectorAll('.categ-tab').forEach(function(b){ b.classList.remove('active'); });
+                        ev.target.classList.add('active');
+                        var categId = ev.target.getAttribute('data-categ');
+                        document.querySelectorAll('.card').forEach(function(c){
+                            c.style.display = (c.getAttribute('data-categ') === categId) ? '' : 'none';
+                        });
+                    });
+
+                    document.getElementById('productGrid').addEventListener('click', function(ev){
+                        var card = ev.target.closest('.card');
+                        if (!card) return;
+                        if (document.body.getAttribute('data-menu-only')) return;
+                        var id = card.getAttribute('data-id');
+                        if (!cart[id]) {
+                            cart[id] = { id: id, name: card.getAttribute('data-name'),
+                                         price: parseFloat(card.getAttribute('data-price')), qty: 0 };
+                        }
+                        cart[id].qty += 1;
+                        renderCart();
+                    });
+
+                    function changeQty(id, delta) {
+                        if (!cart[id]) return;
+                        cart[id].qty += delta;
+                        if (cart[id].qty <= 0) delete cart[id];
+                        renderCart();
+                    }
+
+                    function renderCart() {
+                        var ids = Object.keys(cart);
+                        var linesEl = document.getElementById('cartLines');
+                        var total = 0, count = 0;
+                        if (!ids.length) {
+                            linesEl.innerHTML = '<div class="empty">Panier vide</div>';
+                        } else {
+                            linesEl.innerHTML = '';
+                            ids.forEach(function(id){
+                                var item = cart[id];
+                                total += item.price * item.qty;
+                                count += item.qty;
+                                var row = document.createElement('div');
+                                row.className = 'cart-line';
+                                row.innerHTML = '<span>' + esc(item.name) + '</span>' +
+                                    '<span class="qty-ctrl">' +
+                                    '<button onclick="changeQty(\'' + id + '\',-1)">-</button> ' +
+                                    item.qty +
+                                    ' <button onclick="changeQty(\'' + id + '\',1)">+</button></span>' +
+                                    '<span>' + Math.round(item.price * item.qty) + ' ' + esc(currency) + '</span>';
+                                linesEl.appendChild(row);
+                            });
+                        }
+                        var bar = document.getElementById('cartBar');
+                        bar.style.display = count ? 'flex' : 'none';
+                        document.getElementById('cartCount').textContent = count + ' article(s)';
+                        document.getElementById('cartTotal').textContent = Math.round(total) + ' ' + currency;
+                    }
+
+                    function submitOrder() {
+                        var lines = Object.keys(cart).map(function(id){
+                            return { product_id: cart[id].id, qty: cart[id].qty };
+                        });
+                        if (!lines.length) { alert('Votre panier est vide.'); return; }
+                        fetch('/adk_pos/kiosk/' + configId + '/submit', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ jsonrpc: '2.0', method: 'call',
+                                params: { lines: lines, table_id: tableId,
+                                          customer_note: document.getElementById('customerNote').value } })
+                        }).then(function(r){ return r.json(); }).then(function(data){
+                            var result = data.result || {};
+                            if (result.error) { alert(result.error); return; }
+                            document.body.innerHTML = '<div style="text-align:center;padding:80px 20px;">' +
+                                '<h2>Commande envoyée !</h2><p>Référence : ' + result.order_name + '</p>' +
+                                '<p>Merci, votre commande a été transmise. Un membre de l\'équipe va la confirmer.</p></div>';
+                        }).catch(function(){ alert("Erreur réseau, merci de réessayer."); });
+                    }
+                    ]]>
+                </script>
+            </body>
+        </html>
+    </template>
+
+
+    <template id="customer_display_page" name="Afficheur client">
+        <html lang="fr">
+            <head>
+                <meta charset="utf-8"/>
+                <meta name="viewport" content="width=device-width, initial-scale=1"/>
+                <title>Afficheur client - <t t-esc="config.name"/></title>
+                <style>
+                    body { margin:0; font-family: Inter, Arial, sans-serif; background:#0f1226; color:#eceefc; height:100vh; display:flex; flex-direction:column; }
+                    .top { padding:22px 40px; background:linear-gradient(90deg,#0a0c1d,#232766); font-size:28px; font-weight:800; }
+                    .main { flex:1; display:flex; }
+                    .lines { flex:1; padding:30px 40px; overflow:auto; }
+                    .line { display:flex; justify-content:space-between; font-size:26px; padding:14px 0; border-bottom:1px dashed #2b3062; }
+                    .total { width:36%; background:linear-gradient(135deg,#8a82ff,#4338ca); display:flex; flex-direction:column; align-items:center; justify-content:center; }
+                    .total .lbl { font-size:22px; opacity:.85; text-transform:uppercase; letter-spacing:.1em; }
+                    .total .val { font-size:64px; font-weight:800; margin-top:10px; }
+                    .center { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; font-size:44px; font-weight:800; }
+                    .center small { font-size:24px; opacity:.7; font-weight:500; margin-top:12px; }
+                </style>
+            </head>
+            <body t-att-data-url="'/adk_pos/customer_display/%s/data' % config.id">
+                <div class="top"><t t-esc="config.name"/></div>
+                <div class="main" id="main"></div>
+                <script>
+                    var url = document.body.getAttribute('data-url');
+                    function esc(s){ var d=document.createElement('div'); d.textContent=s==null?'':s; return d.innerHTML; }
+                    function render(d){
+                        var m = document.getElementById('main');
+                        if (d.state === 'order') {
+                            m.innerHTML = '&lt;div class="lines"&gt;' + d.lines.map(function(l){
+                                return '&lt;div class="line"&gt;&lt;span&gt;' + esc(l.qty) + ' × ' + esc(l.name) + '&lt;/span&gt;&lt;strong&gt;' + esc(l.total) + '&lt;/strong&gt;&lt;/div&gt;'; }).join('') +
+                                '&lt;/div&gt;&lt;div class="total"&gt;&lt;div class="lbl"&gt;Total&lt;/div&gt;&lt;div class="val"&gt;' + esc(d.total) + '&lt;/div&gt;&lt;/div&gt;';
+                        } else if (d.state === 'paid') {
+                            m.innerHTML = '&lt;div class="center"&gt;Merci et à bientôt !&lt;small&gt;Payé : ' + esc(d.total) + (d.change ? ' · Monnaie : ' + esc(d.change) : '') + '&lt;/small&gt;&lt;/div&gt;';
+                        } else {
+                            m.innerHTML = '&lt;div class="center"&gt;Bienvenue&lt;small&gt;' + esc(d.text || d.name) + '&lt;/small&gt;&lt;/div&gt;';
+                        }
+                    }
+                    function tick(){
+                        fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({jsonrpc:'2.0', method:'call', params:{}})})
+                          .then(function(r){return r.json();}).then(function(j){ if (j.result) render(j.result); }).catch(function(){});
+                    }
+                    tick(); setInterval(tick, 2000);
+                </script>
+            </body>
+        </html>
+    </template>
+</odoo>
